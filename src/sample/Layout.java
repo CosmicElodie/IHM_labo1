@@ -53,39 +53,10 @@ public class Layout extends Application {
         border.setStyle("-fx-background-color: FFDEF7;");
 
         //------------------------------------------------------------------
-        // CORPS LOGICIEL OÙ SE TROUVE L'IMAGE
-        //------------------------------------------------------------------
-
-        //On crée le corps du logiciel (là où sera l'image)
-        GridPane grid = new GridPane();
-
-        Label labelTextField = new Label("Titre Corps");
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
-        grid.setStyle("-fx-background-color: #DEEAFF;");
-
-        //On met en place le corps du texte
-        border.setCenter(grid);
-
-        //------------------------------------------------------------------
         // BARRE DE NAVIGATION
         //------------------------------------------------------------------
 
         Button button1 = new Button("Upload picture");
-        button1.setOnAction(
-                event -> {
-                    FileChooser chooser = new FileChooser();
-                    File file2 = chooser.showOpenDialog(stage);
-                    if(file2 != null)
-                    {
-                        //Permet d'afficher l'image dans le corps de l'application
-                        Image image = new Image(file2.toURI().toString(), 500, 300,false,false);
-                        ImageView imageView = new ImageView(image);
-                        grid.getChildren().add(imageView);
-                    }
-                }
-        );
 
         HBox hbox = new HBox(10, button1);
         hbox.setPadding(new Insets(15, 12, 15, 12));
@@ -99,6 +70,36 @@ public class Layout extends Application {
 
         //On crée une barre de navigation dans le BorderPane
         border.setTop(hbox);
+
+        //------------------------------------------------------------------
+        // CORPS LOGICIEL OÙ SE TROUVE L'IMAGE
+        //------------------------------------------------------------------
+
+        //On crée le corps du logiciel (là où sera l'image)
+        GridPane grid = new GridPane();
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setStyle("-fx-background-color: #DEEAFF;");
+
+        //On met en place le corps du texte
+        border.setCenter(grid);
+
+        //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
+        button1.setOnAction(
+                event -> {
+                    FileChooser chooser = new FileChooser();
+                    File file2 = chooser.showOpenDialog(stage);
+                    if(file2 != null)
+                    {
+                        //Permet d'afficher l'image dans le corps de l'application
+                        Image image = new Image(file2.toURI().toString(), 500, 300,false,false);
+                        ImageView imageView = new ImageView(image);
+                        grid.getChildren().add(imageView);
+                    }
+                }
+        );
 
         //------------------------------------------------------------------
         // COLONNE GAUCHE POUR LABELS
@@ -128,7 +129,7 @@ public class Layout extends Application {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(15, 12, 15, 12));
 
-        Label labelTextField = new Label("Titre");
+        Label labelTextField = new Label("Ajouter un label");
         TextField textField = new TextField();
 
         TextArea textArea = new TextArea();
