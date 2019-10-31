@@ -1,6 +1,8 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -110,7 +112,7 @@ public class Layout extends Application {
         border.setLeft(addVBox());
 
         //------------------------------------------------------------------
-        // PARAMÈTRES DE LA FENÊTRE
+        // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
         //------------------------------------------------------------------
         //Si on veut rajouter une colonne à droite
         //border.setRight(addFlowPane());
@@ -130,16 +132,31 @@ public class Layout extends Application {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(15, 12, 15, 12));
 
+        //Titre
         Label labelTextField = new Label("Ajouter un label");
-        TextField textField = new TextField();
+
+        //Case pour ajouter un label
+        TextField ajouterLabel = new TextField();
+
+        //Image imageOk = new Image(getClass().getResourceAsStream("C:\\Users\\Elodie\\Desktop\\SCHOOL\\IHM\\IHM_labo1\\src\\images\\check.png"));
         Button button1 = new Button("Valider");
-        
-        TextArea textArea = new TextArea();
-        textArea.setPrefWidth(150);
 
+        //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
+        button1.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
-        VBox.setVgrow(textArea, Priority.ALWAYS);
-        vbox.getChildren().addAll(labelTextField, button1, textField, textArea);
+        TextArea panneauLabel = new TextArea();
+        panneauLabel.setPrefWidth(150);
+        panneauLabel.setPrefHeight(300);
+
+        //marges extérieures des deux cases + button
+        VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
+        VBox.setMargin(ajouterLabel, new Insets(10, 10, 10, 10));
+        VBox.setMargin(button1, new Insets(1, 10, 1, 110));
+
+        //La colonne prend la longueur de la fenêtre
+        //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
+
+        vbox.getChildren().addAll(labelTextField, ajouterLabel, button1, panneauLabel);
 
         return vbox;
     }
