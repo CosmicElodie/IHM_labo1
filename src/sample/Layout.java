@@ -28,6 +28,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -131,12 +132,14 @@ public class Layout extends Application {
 
         Label labelTextField = new Label("Ajouter un label");
         TextField textField = new TextField();
-
+        Button button1 = new Button("Valider");
+        
         TextArea textArea = new TextArea();
         textArea.setPrefWidth(150);
 
+
         VBox.setVgrow(textArea, Priority.ALWAYS);
-        vbox.getChildren().addAll(labelTextField,textField, textArea);
+        vbox.getChildren().addAll(labelTextField, button1, textField, textArea);
 
         return vbox;
     }
