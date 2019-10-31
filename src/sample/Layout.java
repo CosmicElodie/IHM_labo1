@@ -28,12 +28,17 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Sample application that shows examples of the different layout panes
  * provided by the JavaFX layout API.
  * The resulting UI is for demonstration purposes only and is not interactive.
  */
 public class Layout extends Application {
+    private ButtonUpload uploadPicture;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -45,12 +50,12 @@ public class Layout extends Application {
         border.setTop(hbox);
         //border.setLeft(addVBox());
 
-// Add a stack to the HBox in the top region
+// Ajouter un bouton "aide" dans le header
         addStackPane(hbox);
 
 // To see only the grid in the center, uncomment the following statement
-// comment out the setCenter() call farther down        
-//        border.setCenter(addGridPane());
+// comment out the setCenter() call farther down
+        border.setCenter(addGridPane());
 
 // Choose either a TilePane or FlowPane for right region and comment out the
 // one you aren't using        
@@ -59,8 +64,10 @@ public class Layout extends Application {
 
 // To see only the grid in the center, comment out the following statement
 // If both setCenter() calls are executed, the anchor pane from the second
-// call replaces the grid from the first call        
-        //border.setCenter(addAnchorPane(addGridPane()));
+// call replaces the grid from the first call
+
+        //BOUTON SAVE ET CANCEL
+        border.setCenter(addAnchorPane(addGridPane()));
 
         Scene scene = new Scene(border,1200,800);
         stage.setScene(scene);
@@ -69,7 +76,7 @@ public class Layout extends Application {
     }
 
     /*
-     * Creates an HBox with two buttons for the top region
+     * HEADER -> UPLOAD BUTTON
      */
 
     private HBox addHBox(Stage primaryStage) throws Exception {
@@ -79,9 +86,14 @@ public class Layout extends Application {
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #336699;");
 
-        ButtonUpload uploadPicture = new ButtonUpload();
+        //on créé le bouton "upload"
+        uploadPicture = new ButtonUpload();
+
+        //on le définit
         uploadPicture.definirBouton(primaryStage);
 
+
+        //on définit sa taille
         uploadPicture.getButton().setPrefSize(100, 20);
 
         hbox.getChildren().addAll(uploadPicture.getButton());
@@ -90,7 +102,7 @@ public class Layout extends Application {
     }
 
     /*
-     * Creates a VBox with a list of links for the left region
+     * MENU GAUCHE
      */
     private VBox addVBox() {
 
@@ -118,7 +130,7 @@ public class Layout extends Application {
     }
 
     /*
-     * Uses a stack pane to create a help icon and adds it to the right side of an HBox
+     * HELP BUTTON EN HAUT à DROITE
      *
      * @param hb HBox to add the stack to
      */
@@ -152,15 +164,22 @@ public class Layout extends Application {
     }
 
     /*
-     * Creates a grid for the center region with four columns and three rows
+     * CORPS DU LOGICIEL
      */
     private GridPane addGridPane() {
 
         GridPane grid = new GridPane();
+
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(0, 10, 0, 10));
+        grid.setPadding(new Insets(50, 50, 50, 50));
 
+        File file = new File("C:\\Users\\Elodie\\Desktop\\ART\\pokemon.jpg");
+        Image image = new Image(file.toURI().toString(), 500, 300,false,false);
+        ImageView iv = new ImageView(image);
+
+        grid.getChildren().add(iv);
+/*
         // Category in column 2, row 1
         Text category = new Text("Sales:");
         category.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -194,7 +213,7 @@ public class Layout extends Application {
         Text servicesPercent = new Text("Services\n20%");
         GridPane.setValignment(servicesPercent, VPos.TOP);
         grid.add(servicesPercent, 3, 2);
-
+*/
 //        grid.setGridLinesVisible(true);
         return grid;
     }
@@ -205,6 +224,7 @@ public class Layout extends Application {
     private FlowPane addFlowPane() {
 
         FlowPane flow = new FlowPane();
+
         flow.setPadding(new Insets(5, 0, 5, 0));
         flow.setVgap(4);
         flow.setHgap(4);
