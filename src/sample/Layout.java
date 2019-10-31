@@ -5,8 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -26,9 +25,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,67 +39,85 @@ import java.util.List;
  * The resulting UI is for demonstration purposes only and is not interactive.
  */
 public class Layout extends Application {
-    private ButtonUpload uploadPicture;
 
     @Override
     public void start(Stage stage) throws Exception {
 
-// Use a border pane as the root for scene
+        //------------------------------------------------------------------
+        // DEFINITION DE LA FENÊTRE
+        //------------------------------------------------------------------
+        //Racine de scene
         BorderPane border = new BorderPane();
 
-        HBox hbox = addHBox(stage);
-        border.setTop(hbox);
-        //border.setLeft(addVBox());
+        //fond rose de base
+        border.setStyle("-fx-background-color: FFDEF7;");
 
-// Ajouter un bouton "aide" dans le header
+        //------------------------------------------------------------------
+        // CORPS LOGICIEL OÙ SE TROUVE L'IMAGE
+        //------------------------------------------------------------------
+
+        //On crée le corps du logiciel (là où sera l'image)
+        GridPane grid = new GridPane();
+
+        Label labelTextField = new Label("Titre Corps");
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setStyle("-fx-background-color: #DEEAFF;");
+
+        //On met en place le corps du texte
+        border.setCenter(grid);
+
+        //------------------------------------------------------------------
+        // BARRE DE NAVIGATION
+        //------------------------------------------------------------------
+
+        Button button1 = new Button("Upload picture");
+        button1.setOnAction(
+                event -> {
+                    FileChooser chooser = new FileChooser();
+                    File file2 = chooser.showOpenDialog(stage);
+                    if(file2 != null)
+                    {
+                        //Permet d'afficher l'image dans le corps de l'application
+                        Image image = new Image(file2.toURI().toString(), 500, 300,false,false);
+                        ImageView imageView = new ImageView(image);
+                        grid.getChildren().add(imageView);
+                    }
+                }
+        );
+
+        HBox hbox = new HBox(10, button1);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
+        hbox.setSpacing(10);   // Gap between nodes
+        hbox.setStyle("-fx-background-color: #CDAEF3;");
+
+        //hbox.getChildren().addAll(button1, chosen);
+
+        // Ajouter un bouton "aide" dans le header
         addStackPane(hbox);
 
-// To see only the grid in the center, uncomment the following statement
-// comment out the setCenter() call farther down
-        border.setCenter(addGridPane());
+        //On crée une barre de navigation dans le BorderPane
+        border.setTop(hbox);
 
-// Choose either a TilePane or FlowPane for right region and comment out the
-// one you aren't using        
+        //------------------------------------------------------------------
+        // COLONNE GAUCHE POUR LABELS
+        //------------------------------------------------------------------
+
+        //On crée une colonne contenant les labels
+        border.setLeft(addVBox());
+
+        //------------------------------------------------------------------
+        // PARAMÈTRES DE LA FENÊTRE
+        //------------------------------------------------------------------
+        //Si on veut rajouter une colonne à droite
         //border.setRight(addFlowPane());
         //border.setRight(addTilePane());
 
-// To see only the grid in the center, comment out the following statement
-// If both setCenter() calls are executed, the anchor pane from the second
-// call replaces the grid from the first call
-
-        //BOUTON SAVE ET CANCEL
-        border.setCenter(addAnchorPane(addGridPane()));
-
-        Scene scene = new Scene(border,1200,800);
+        Scene scene = new Scene(border,950,600);
         stage.setScene(scene);
         stage.setTitle("BeSt ApP Ev4");
         stage.show();
-    }
-
-    /*
-     * HEADER -> UPLOAD BUTTON
-     */
-
-    private HBox addHBox(Stage primaryStage) throws Exception {
-
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);   // Gap between nodes
-        hbox.setStyle("-fx-background-color: #336699;");
-
-        //on créé le bouton "upload"
-        uploadPicture = new ButtonUpload();
-
-        //on le définit
-        uploadPicture.definirBouton(primaryStage);
-
-
-        //on définit sa taille
-        uploadPicture.getButton().setPrefSize(100, 20);
-
-        hbox.getChildren().addAll(uploadPicture.getButton());
-
-        return hbox;
     }
 
     /*
@@ -107,24 +126,16 @@ public class Layout extends Application {
     private VBox addVBox() {
 
         VBox vbox = new VBox();
-        vbox.setPadding(new Insets(10)); // Set all sides to 10
-        vbox.setSpacing(8);              // Gap between nodes
+        vbox.setPadding(new Insets(15, 12, 15, 12));
 
-        Text title = new Text("Data");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        vbox.getChildren().add(title);
+        Label labelTextField = new Label("Titre");
+        TextField textField = new TextField();
 
-        Hyperlink options[] = new Hyperlink[] {
-                new Hyperlink("Sales"),
-                new Hyperlink("Marketing"),
-                new Hyperlink("Distribution"),
-                new Hyperlink("Costs")};
+        TextArea textArea = new TextArea();
+        textArea.setPrefWidth(150);
 
-        for (int i=0; i<4; i++) {
-            // Add offset to left side to indent from title
-            VBox.setMargin(options[i], new Insets(0, 0, 0, 8));
-            vbox.getChildren().add(options[i]);
-        }
+        VBox.setVgrow(textArea, Priority.ALWAYS);
+        vbox.getChildren().addAll(labelTextField,textField, textArea);
 
         return vbox;
     }
@@ -163,60 +174,6 @@ public class Layout extends Application {
 
     }
 
-    /*
-     * CORPS DU LOGICIEL
-     */
-    private GridPane addGridPane() {
-
-        GridPane grid = new GridPane();
-
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(50, 50, 50, 50));
-
-        File file = new File("C:\\Users\\Elodie\\Desktop\\ART\\pokemon.jpg");
-        Image image = new Image(file.toURI().toString(), 500, 300,false,false);
-        ImageView iv = new ImageView(image);
-
-        grid.getChildren().add(iv);
-/*
-        // Category in column 2, row 1
-        Text category = new Text("Sales:");
-        category.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        grid.add(category, 1, 0);
-
-        // Title in column 3, row 1
-        Text chartTitle = new Text("Current Year");
-        chartTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        grid.add(chartTitle, 2, 0);
-
-        // Subtitle in columns 2-3, row 2
-        Text chartSubtitle = new Text("Goods and Services");
-        grid.add(chartSubtitle, 1, 1, 2, 1);
-
-        // House icon in column 1, rows 1-2
-        ImageView imageHouse = new ImageView(
-                new Image(Layout.class.getResourceAsStream("graphics/house.png")));
-        grid.add(imageHouse, 0, 0, 1, 2);
-
-        // Left label in column 1 (bottom), row 3
-        Text goodsPercent = new Text("Goods\n80%");
-        GridPane.setValignment(goodsPercent, VPos.BOTTOM);
-        grid.add(goodsPercent, 0, 2);
-
-        // Chart in columns 2-3, row 3
-        ImageView imageChart = new ImageView(
-                new Image(Layout.class.getResourceAsStream("graphics/piechart.png")));
-        grid.add(imageChart, 1, 2, 2, 1);
-
-        // Right label in column 4 (top), row 3
-        Text servicesPercent = new Text("Services\n20%");
-        GridPane.setValignment(servicesPercent, VPos.TOP);
-        grid.add(servicesPercent, 3, 2);
-*/
-//        grid.setGridLinesVisible(true);
-        return grid;
-    }
 
     /*
      * Creates a horizontal flow pane with eight icons in four rows
