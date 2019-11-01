@@ -35,69 +35,33 @@ import java.io.File;
 public class Layout extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-
+    public void start(Stage stage) throws Exception
+    {
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
         //Racine de scene
         BorderPane border = new BorderPane();
 
-        //fond rose de base
-        border.setStyle("-fx-background-color: FFDEF7;");
+        //fond blanc de base
+        border.setStyle("-fx-background-color: FFFFFF;");
 
         //------------------------------------------------------------------
         // BARRE DE NAVIGATION
         //------------------------------------------------------------------
 
+        //On créé le bouton "upload picture"
         Button uploadPictureButton = new Button("Upload picture");
 
-        HBox hbox = new HBox(10, uploadPictureButton);
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);   // Gap between nodes
-        hbox.setStyle("-fx-background-color: #CDAEF3;");
-
-        // Ajouter un bouton "aide" dans le header
-        helpButton(hbox);
-
         //On crée une barre de navigation dans le BorderPane
-        border.setTop(hbox);
+        border.setTop(navBar(uploadPictureButton));
 
         //------------------------------------------------------------------
         // CORPS LOGICIEL OÙ SE TROUVE L'IMAGE
         //------------------------------------------------------------------
 
-        //On crée le corps du logiciel (là où sera l'image)
-        GridPane grid = new GridPane();
-
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(50, 50, 50, 50));
-        grid.setStyle("-fx-background-color: #DEEAFF;");
-
         //On met en place le corps du texte
-        border.setCenter(grid);
-
-        //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
-        uploadPictureButton.setOnAction(
-                event -> {
-                    Image image = null;
-                    ImageView imageView = new ImageView();
-
-                    FileChooser chooser = new FileChooser();
-                    File file2 = chooser.showOpenDialog(stage);
-                    if(file2 != null)
-                    {
-                        //Permet d'afficher l'image dans le corps de l'application
-                        image = new Image(file2.toURI().toString(), 800, 300 ,true,false);
-                        imageView.setImage(image);
-                        grid.getChildren().add(imageView);
-                    }
-
-
-                }
-        );
-
+        border.setCenter(corpsLogiciel(uploadPictureButton, stage));
 
         //------------------------------------------------------------------
         // COLONNE GAUCHE POUR LABELS
@@ -119,12 +83,74 @@ public class Layout extends Application {
         stage.show();
     }
 
-    /*
-     * MENU GAUCHE
+    /**
+     * NAVIGATION
+     * -> upload button
+     * -> help button
+     * @return
+     */
+    private HBox navBar(Button uploadPictureButton)
+    {
+
+
+        HBox hbox = new HBox(10, uploadPictureButton);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
+        hbox.setSpacing(10);   // Gap between nodes
+        hbox.setStyle("-fx-background-color: #CDAEF3;");
+
+        // Ajouter un bouton "aide" dans le header
+        helpButton(hbox);
+
+        return hbox;
+    }
+
+    /**
+     * Corps logiciel
+     * -> là où se charge l'image
+     * @return
+     */
+    private GridPane corpsLogiciel(Button uploadPictureButton, Stage stage)
+    {
+        //On crée le corps du logiciel (là où sera l'image)
+        GridPane grid = new GridPane();
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(50, 50, 50, 50));
+        grid.setStyle("-fx-background-color: #DEEAFF;");
+
+        //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
+        uploadPictureButton.setOnAction(
+                event -> {
+                    Image image = null;
+                    ImageView imageView = new ImageView();
+
+                    FileChooser chooser = new FileChooser();
+                    File file2 = chooser.showOpenDialog(stage);
+                    if(file2 != null)
+                    {
+                        //Permet d'afficher l'image dans le corps de l'application
+                        image = new Image(file2.toURI().toString(), 800, 300 ,true,false);
+                        imageView.setImage(image);
+                        grid.getChildren().add(imageView);
+                    }
+
+
+                }
+        );
+
+        return grid;
+    }
+
+    /**
+     * Menu de gestions de labels
+     * @return
      */
     private VBox menuLabels() {
 
         VBox panneauVertical = new VBox();
+        panneauVertical.setStyle("-fx-background-color: #FFDEF7;"); //rose
+
         panneauVertical.setPadding(new Insets(15, 12, 15, 12));
 
         //TITRE AJOUTER UN LABEL
@@ -181,10 +207,10 @@ public class Layout extends Application {
         return panneauVertical;
     }
 
-    /*
-     * HELP BUTTON EN HAUT à DROITE
-     *
-     * @param hb HBox to add the stack to
+    /**
+     * Help button
+     * -> pas encore implémenté les fonctionnalités
+     * @param hb
      */
     private void helpButton(HBox hb) {
 
@@ -215,53 +241,6 @@ public class Layout extends Application {
 
     }
 
-
-    /* PAS ENCORE UTILISÉ
-     * Creates a horizontal flow pane with eight icons in four rows
-     */
-    private FlowPane addFlowPane() {
-
-        FlowPane flow = new FlowPane();
-
-        flow.setPadding(new Insets(5, 0, 5, 0));
-        flow.setVgap(4);
-        flow.setHgap(4);
-        flow.setPrefWrapLength(170); // preferred width allows for two columns
-        flow.setStyle("-fx-background-color: DAE6F3;");
-
-        ImageView pages[] = new ImageView[8];
-        for (int i=0; i<8; i++) {
-            pages[i] = new ImageView(
-                    new Image(Layout.class.getResourceAsStream(
-                            "graphics/chart_"+(i+1)+".png")));
-            flow.getChildren().add(pages[i]);
-        }
-
-        return flow;
-    }
-
-    /* PAS ENCORE UTILISÉ
-     * Creates a horizontal (default) tile pane with eight icons in four rows
-     */
-    private TilePane addTilePane() {
-
-        TilePane tile = new TilePane();
-        tile.setPadding(new Insets(5, 0, 5, 0));
-        tile.setVgap(4);
-        tile.setHgap(4);
-        tile.setPrefColumns(2);
-        tile.setStyle("-fx-background-color: DAE6F3;");
-
-        ImageView pages[] = new ImageView[8];
-        for (int i=0; i<8; i++) {
-            pages[i] = new ImageView(
-                    new Image(Layout.class.getResourceAsStream(
-                            "graphics/chart_"+(i+1)+".png")));
-            tile.getChildren().add(pages[i]);
-        }
-
-        return tile;
-    }
 
     /*
      * BOUTONS SAUVEGARDER ET ANNULER (pas encore utilisés)
