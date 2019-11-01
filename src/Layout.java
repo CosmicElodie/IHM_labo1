@@ -35,40 +35,82 @@ import java.io.File;
 public class Layout extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-
+    public void start(Stage stage) throws Exception
+    {
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
         //Racine de scene
         BorderPane border = new BorderPane();
 
-        //fond rose de base
-        border.setStyle("-fx-background-color: FFDEF7;");
+        //fond blanc de base
+        border.setStyle("-fx-background-color: FFFFFF;");
 
         //------------------------------------------------------------------
         // BARRE DE NAVIGATION
         //------------------------------------------------------------------
 
-        Button button1 = new Button("Upload picture");
-
-        HBox hbox = new HBox(10, button1);
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);   // Gap between nodes
-        hbox.setStyle("-fx-background-color: #CDAEF3;");
-
-        //hbox.getChildren().addAll(button1, chosen);
-
-        // Ajouter un bouton "aide" dans le header
-        helpButton(hbox);
+        //On créé le bouton "upload picture"
+        Button uploadPictureButton = new Button("Upload picture");
 
         //On crée une barre de navigation dans le BorderPane
-        border.setTop(hbox);
+        border.setTop(navBar(uploadPictureButton));
 
         //------------------------------------------------------------------
         // CORPS LOGICIEL OÙ SE TROUVE L'IMAGE
         //------------------------------------------------------------------
 
+        //On met en place le corps du texte
+        border.setCenter(corpsLogiciel(uploadPictureButton, stage));
+
+        //------------------------------------------------------------------
+        // COLONNE GAUCHE POUR LABELS
+        //------------------------------------------------------------------
+
+        //On crée une colonne contenant les labels
+        border.setLeft(menuLabels());
+
+        //------------------------------------------------------------------
+        // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
+        //------------------------------------------------------------------
+        //Si on veut rajouter une colonne à droite
+        //border.setRight(addFlowPane());
+        //border.setRight(addTilePane());
+
+        Scene scene = new Scene(border,950,600);
+        stage.setScene(scene);
+        stage.setTitle("BeSt ApP Ev4");
+        stage.show();
+    }
+
+    /**
+     * NAVIGATION
+     * -> upload button
+     * -> help button
+     * @return
+     */
+    private HBox navBar(Button uploadPictureButton)
+    {
+
+
+        HBox hbox = new HBox(10, uploadPictureButton);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
+        hbox.setSpacing(10);   // Gap between nodes
+        hbox.setStyle("-fx-background-color: #CDAEF3;");
+
+        // Ajouter un bouton "aide" dans le header
+        helpButton(hbox);
+
+        return hbox;
+    }
+
+    /**
+     * Corps logiciel
+     * -> là où se charge l'image
+     * @return
+     */
+    private GridPane corpsLogiciel(Button uploadPictureButton, Stage stage)
+    {
         //On crée le corps du logiciel (là où sera l'image)
         GridPane grid = new GridPane();
 
@@ -77,11 +119,8 @@ public class Layout extends Application {
         grid.setPadding(new Insets(50, 50, 50, 50));
         grid.setStyle("-fx-background-color: #DEEAFF;");
 
-        //On met en place le corps du texte
-        border.setCenter(grid);
-
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
-        button1.setOnAction(
+        uploadPictureButton.setOnAction(
                 event -> {
                     Image image = null;
                     ImageView imageView = new ImageView();
@@ -100,38 +139,23 @@ public class Layout extends Application {
                 }
         );
 
-
-        //------------------------------------------------------------------
-        // COLONNE GAUCHE POUR LABELS
-        //------------------------------------------------------------------
-
-        //On crée une colonne contenant les labels
-        border.setLeft(addVBox());
-
-        //------------------------------------------------------------------
-        // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
-        //------------------------------------------------------------------
-        //Si on veut rajouter une colonne à droite
-        //border.setRight(addFlowPane());
-        //border.setRight(addTilePane());
-
-        Scene scene = new Scene(border,950,600);
-        stage.setScene(scene);
-        stage.setTitle("BeSt ApP Ev4");
-        stage.show();
+        return grid;
     }
 
-    /*
-     * MENU GAUCHE
+    /**
+     * Menu de gestions de labels
+     * @return
      */
-    private VBox addVBox() {
+    private VBox menuLabels() {
 
         VBox panneauVertical = new VBox();
+        panneauVertical.setStyle("-fx-background-color: #FFDEF7;"); //rose
+
         panneauVertical.setPadding(new Insets(15, 12, 15, 12));
 
         //TITRE AJOUTER UN LABEL
-        Label labelTextField = new Label("Ajouter un label");
-        panneauVertical.getChildren().add(labelTextField); //permet d'afficher l'élément dans le panneau
+        Label titreLabel = new Label("Ajouter un label");
+        panneauVertical.getChildren().add(titreLabel); //permet d'afficher l'élément dans le panneau
 
         //CASE AJOUTER UN LABEL
         TextField ajouterLabel = new TextField();
@@ -156,6 +180,11 @@ public class Layout extends Application {
         panneauLabel.setPrefWidth(150);
         panneauLabel.setPrefHeight(300);
 
+        //Event qui ajouter un label dans le panneau
+        checkButton.setOnAction( e ->
+                {
+                    panneauLabel.setText(ajouterLabel.getText());
+                });
         //DELETE BUTTON
         Button deleteButton = new Button();
         panneauVertical.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
@@ -178,10 +207,10 @@ public class Layout extends Application {
         return panneauVertical;
     }
 
-    /*
-     * HELP BUTTON EN HAUT à DROITE
-     *
-     * @param hb HBox to add the stack to
+    /**
+     * Help button
+     * -> pas encore implémenté les fonctionnalités
+     * @param hb
      */
     private void helpButton(HBox hb) {
 
@@ -212,53 +241,6 @@ public class Layout extends Application {
 
     }
 
-
-    /* PAS ENCORE UTILISÉ
-     * Creates a horizontal flow pane with eight icons in four rows
-     */
-    private FlowPane addFlowPane() {
-
-        FlowPane flow = new FlowPane();
-
-        flow.setPadding(new Insets(5, 0, 5, 0));
-        flow.setVgap(4);
-        flow.setHgap(4);
-        flow.setPrefWrapLength(170); // preferred width allows for two columns
-        flow.setStyle("-fx-background-color: DAE6F3;");
-
-        ImageView pages[] = new ImageView[8];
-        for (int i=0; i<8; i++) {
-            pages[i] = new ImageView(
-                    new Image(Layout.class.getResourceAsStream(
-                            "graphics/chart_"+(i+1)+".png")));
-            flow.getChildren().add(pages[i]);
-        }
-
-        return flow;
-    }
-
-    /* PAS ENCORE UTILISÉ
-     * Creates a horizontal (default) tile pane with eight icons in four rows
-     */
-    private TilePane addTilePane() {
-
-        TilePane tile = new TilePane();
-        tile.setPadding(new Insets(5, 0, 5, 0));
-        tile.setVgap(4);
-        tile.setHgap(4);
-        tile.setPrefColumns(2);
-        tile.setStyle("-fx-background-color: DAE6F3;");
-
-        ImageView pages[] = new ImageView[8];
-        for (int i=0; i<8; i++) {
-            pages[i] = new ImageView(
-                    new Image(Layout.class.getResourceAsStream(
-                            "graphics/chart_"+(i+1)+".png")));
-            tile.getChildren().add(pages[i]);
-        }
-
-        return tile;
-    }
 
     /*
      * BOUTONS SAUVEGARDER ET ANNULER (pas encore utilisés)
