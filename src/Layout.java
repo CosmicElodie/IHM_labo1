@@ -1,11 +1,6 @@
-package sample;
-
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -30,11 +25,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sample application that shows examples of the different layout panes
@@ -69,7 +60,7 @@ public class Layout extends Application {
         //hbox.getChildren().addAll(button1, chosen);
 
         // Ajouter un bouton "aide" dans le header
-        addStackPane(hbox);
+        helpButton(hbox);
 
         //On crée une barre de navigation dans le BorderPane
         border.setTop(hbox);
@@ -138,8 +129,14 @@ public class Layout extends Application {
         //Case pour ajouter un label
         TextField ajouterLabel = new TextField();
 
-        //Image imageOk = new Image(getClass().getResourceAsStream("C:\\Users\\Elodie\\Desktop\\SCHOOL\\IHM\\IHM_labo1\\src\\images\\check.png"));
-        Button button1 = new Button("Valider");
+        Button button1 = new Button();
+
+        //the check icon
+        Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
+        ImageView checkIconView = new ImageView(checkIcon);
+        checkIconView.setFitHeight(10);
+        checkIconView.setFitWidth(10);
+        button1.setGraphic(checkIconView);//setting icon to button
 
         //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
         button1.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
@@ -151,7 +148,7 @@ public class Layout extends Application {
         //marges extérieures des deux cases + button
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(ajouterLabel, new Insets(10, 10, 10, 10));
-        VBox.setMargin(button1, new Insets(1, 10, 1, 110));
+        VBox.setMargin(button1, new Insets(1, 10, 1, 150));
 
         //La colonne prend la longueur de la fenêtre
         //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
@@ -166,7 +163,7 @@ public class Layout extends Application {
      *
      * @param hb HBox to add the stack to
      */
-    private void addStackPane(HBox hb) {
+    private void helpButton(HBox hb) {
 
         StackPane stack = new StackPane();
         Rectangle helpIcon = new Rectangle(30.0, 25.0);
@@ -196,7 +193,7 @@ public class Layout extends Application {
     }
 
 
-    /*
+    /* PAS ENCORE UTILISÉ
      * Creates a horizontal flow pane with eight icons in four rows
      */
     private FlowPane addFlowPane() {
@@ -220,7 +217,7 @@ public class Layout extends Application {
         return flow;
     }
 
-    /*
+    /* PAS ENCORE UTILISÉ
      * Creates a horizontal (default) tile pane with eight icons in four rows
      */
     private TilePane addTilePane() {
@@ -244,11 +241,11 @@ public class Layout extends Application {
     }
 
     /*
-     * Creates an anchor pane using the provided grid and an HBox with buttons
+     * BOUTONS SAUVEGARDER ET ANNULER (pas encore utilisés)
      *
      * @param grid Grid to anchor to the top of the anchor pane
      */
-    private AnchorPane addAnchorPane(GridPane grid) {
+    private AnchorPane saveAndCancel(GridPane grid) {
 
         AnchorPane anchorpane = new AnchorPane();
 
