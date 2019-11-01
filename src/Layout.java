@@ -129,17 +129,30 @@ public class Layout extends Application {
         //Case pour ajouter un label
         TextField ajouterLabel = new TextField();
 
-        Button button1 = new Button();
+        //On créé une box horizontale pour aligne les boutons
+        HBox buttonsBox = new HBox();
+        buttonsBox.setPadding(new Insets(10, 10, 10, 10));
+        
+
+        Button checkButton = new Button();
+        Button deleteButton = new Button();
 
         //the check icon
         Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
         ImageView checkIconView = new ImageView(checkIcon);
         checkIconView.setFitHeight(10);
         checkIconView.setFitWidth(10);
-        button1.setGraphic(checkIconView);//setting icon to button
+        checkButton.setGraphic(checkIconView);//setting icon to button
 
         //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
-        button1.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
+        //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
+
+        //the delete icon
+        Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
+        ImageView deleteIconView = new ImageView(deleteIcon);
+        deleteIconView.setFitHeight(10);
+        deleteIconView.setFitWidth(10);
+        deleteButton.setGraphic(deleteIconView);//setting icon to button
 
         TextArea panneauLabel = new TextArea();
         panneauLabel.setPrefWidth(150);
@@ -148,12 +161,12 @@ public class Layout extends Application {
         //marges extérieures des deux cases + button
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(ajouterLabel, new Insets(10, 10, 10, 10));
-        VBox.setMargin(button1, new Insets(1, 10, 1, 150));
+        VBox.setMargin(checkButton, new Insets(1, 10, 1, 150));
 
         //La colonne prend la longueur de la fenêtre
         //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
 
-        vbox.getChildren().addAll(labelTextField, ajouterLabel, button1, panneauLabel);
+        vbox.getChildren().addAll(labelTextField, ajouterLabel, deleteButton, checkButton, panneauLabel);
 
         return vbox;
     }
