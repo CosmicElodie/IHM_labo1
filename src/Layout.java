@@ -70,6 +70,21 @@ public class Layout extends Application {
         //On crée une colonne contenant les labels
         border.setLeft(menuLabels());
 
+
+        //------------------------------------------------------------------
+        // COLONNE DROITE POUR ???
+        //------------------------------------------------------------------
+
+        //On crée une colonne contenant les labels
+        border.setRight(menuDroite());
+
+        //------------------------------------------------------------------
+        // FOOTER
+        //------------------------------------------------------------------
+
+        //On crée une barre de navigation dans le BorderPane
+        border.setBottom(footerBar());
+
         //------------------------------------------------------------------
         // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
         //------------------------------------------------------------------
@@ -91,15 +106,30 @@ public class Layout extends Application {
      */
     private HBox navBar(Button uploadPictureButton)
     {
-
-
         HBox hbox = new HBox(10, uploadPictureButton);
-        hbox.setPadding(new Insets(15, 12, 15, 12));
+        hbox.setPadding(new Insets(15, 15, 15, 15));
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #CDAEF3;");
 
         // Ajouter un bouton "aide" dans le header
         helpButton(hbox);
+
+        return hbox;
+    }
+
+    /**
+     * Footer
+     */
+    private HBox footerBar()
+    {
+        HBox hbox = new HBox();
+        hbox.setPadding(new Insets(15, 15, 15, 15));
+        hbox.setStyle("-fx-background-color: #CDAEF3;");
+
+        Label copyright = new Label();
+        copyright.setText("Copyright Crüll Loris, Lagier Elodie");
+        hbox.getChildren().add(copyright);
+        hbox.setAlignment(Pos.CENTER);
 
         return hbox;
     }
@@ -116,8 +146,9 @@ public class Layout extends Application {
 
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(50, 50, 50, 50));
+        grid.setPadding(new Insets(15, 15, 15, 15));
         grid.setStyle("-fx-background-color: #DEEAFF;");
+        grid.setPrefWidth(400);
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         uploadPictureButton.setOnAction(
@@ -130,12 +161,10 @@ public class Layout extends Application {
                     if(file2 != null)
                     {
                         //Permet d'afficher l'image dans le corps de l'application
-                        image = new Image(file2.toURI().toString(), 800, 300 ,true,false);
+                        image = new Image(file2.toURI().toString(), 500, 450 ,true,false);
                         imageView.setImage(image);
                         grid.getChildren().add(imageView);
                     }
-
-
                 }
         );
 
@@ -143,27 +172,27 @@ public class Layout extends Application {
     }
 
     /**
-     * Menu de gestions de labels
+     * Menu de gestions de labels (gauche)
      * @return
      */
     private VBox menuLabels() {
 
-        VBox panneauVertical = new VBox();
-        panneauVertical.setStyle("-fx-background-color: #FFDEF7;"); //rose
+        VBox panneauVerticalGauche = new VBox();
+        panneauVerticalGauche.setStyle("-fx-background-color: #FFDEF7;"); //rose
 
-        panneauVertical.setPadding(new Insets(15, 12, 15, 12));
+        panneauVerticalGauche.setPadding(new Insets(15, 15, 15, 15));
 
         //TITRE AJOUTER UN LABEL
         Label titreLabel = new Label("Ajouter un label");
-        panneauVertical.getChildren().add(titreLabel); //permet d'afficher l'élément dans le panneau
+        panneauVerticalGauche.getChildren().add(titreLabel); //permet d'afficher l'élément dans le panneau
 
         //CASE AJOUTER UN LABEL
         TextField ajouterLabel = new TextField();
-        panneauVertical.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
+        panneauVerticalGauche.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
 
         //CHECK BUTTON
         Button checkButton = new Button();
-        panneauVertical.getChildren().add(checkButton); //permet d'afficher l'élément dans le panneau
+        panneauVerticalGauche.getChildren().add(checkButton); //permet d'afficher l'élément dans le panneau
 
         Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
         ImageView checkIconView = new ImageView(checkIcon);
@@ -176,7 +205,7 @@ public class Layout extends Application {
 
         //CASE OÙ SONT STOCKéS LES LABELS
         TextArea panneauLabel = new TextArea();
-        panneauVertical.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
+        panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.setPrefWidth(150);
         panneauLabel.setPrefHeight(300);
 
@@ -187,7 +216,7 @@ public class Layout extends Application {
                 });
         //DELETE BUTTON
         Button deleteButton = new Button();
-        panneauVertical.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
+        panneauVerticalGauche.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
 
         Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
         ImageView deleteIconView = new ImageView(deleteIcon);
@@ -204,7 +233,24 @@ public class Layout extends Application {
         //La colonne prend la longueur de la fenêtre
         //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
 
-        return panneauVertical;
+        return panneauVerticalGauche;
+    }
+
+    /**
+     * MENU DROITE
+     * @return
+     */
+    private VBox menuDroite()
+    {
+        VBox panneauVerticalDroit = new VBox();
+        panneauVerticalDroit.setStyle("-fx-background-color: #FFDEF7;"); //rose
+        panneauVerticalDroit.setPadding(new Insets(15, 15, 15, 15));
+
+        //CASE AJOUTER UN LABEL
+        TextField ajouterLabel = new TextField();
+        panneauVerticalDroit.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
+
+        return panneauVerticalDroit;
     }
 
     /**
