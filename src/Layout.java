@@ -130,8 +130,8 @@ public class Layout extends Application {
         panneauVertical.setPadding(new Insets(15, 12, 15, 12));
 
         //TITRE AJOUTER UN LABEL
-        Label labelTextField = new Label("Ajouter un label");
-        panneauVertical.getChildren().add(labelTextField); //permet d'afficher l'élément dans le panneau
+        Label titreLabel = new Label("Ajouter un label");
+        panneauVertical.getChildren().add(titreLabel); //permet d'afficher l'élément dans le panneau
 
         //CASE AJOUTER UN LABEL
         TextField ajouterLabel = new TextField();
@@ -156,6 +156,11 @@ public class Layout extends Application {
         panneauLabel.setPrefWidth(150);
         panneauLabel.setPrefHeight(300);
 
+        //Event qui ajouter un label dans le panneau
+        checkButton.setOnAction( e ->
+                {
+                    panneauLabel.setText(ajouterLabel.getText());
+                });
         //DELETE BUTTON
         Button deleteButton = new Button();
         panneauVertical.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
