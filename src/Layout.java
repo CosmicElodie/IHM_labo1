@@ -126,22 +126,19 @@ public class Layout extends Application {
      */
     private VBox addVBox() {
 
-        VBox vbox = new VBox();
-        vbox.setPadding(new Insets(15, 12, 15, 12));
+        VBox panneauVertical = new VBox();
+        panneauVertical.setPadding(new Insets(15, 12, 15, 12));
 
         //Titre
         Label labelTextField = new Label("Ajouter un label");
+        panneauVertical.getChildren().add(labelTextField); //permet d'afficher l'élément dans le panneau
 
         //Case pour ajouter un label
         TextField ajouterLabel = new TextField();
-
-        //On créé une box horizontale pour aligne les boutons
-        HBox buttonsBox = new HBox();
-        buttonsBox.setPadding(new Insets(10, 10, 10, 10));
-
+        panneauVertical.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
 
         Button checkButton = new Button();
-
+        panneauVertical.getChildren().add(checkButton); //permet d'afficher l'élément dans le panneau
 
         //the check icon
         Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
@@ -154,10 +151,12 @@ public class Layout extends Application {
         //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
         TextArea panneauLabel = new TextArea();
+        panneauVertical.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.setPrefWidth(150);
         panneauLabel.setPrefHeight(300);
 
         Button deleteButton = new Button();
+        panneauVertical.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
 
         //the delete icon
         Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
@@ -175,9 +174,7 @@ public class Layout extends Application {
         //La colonne prend la longueur de la fenêtre
         //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
 
-        vbox.getChildren().addAll(labelTextField, ajouterLabel, checkButton,panneauLabel,deleteButton);
-
-        return vbox;
+        return panneauVertical;
     }
 
     /*
