@@ -129,18 +129,18 @@ public class Layout extends Application {
         VBox panneauVertical = new VBox();
         panneauVertical.setPadding(new Insets(15, 12, 15, 12));
 
-        //Titre
+        //TITRE AJOUTER UN LABEL
         Label labelTextField = new Label("Ajouter un label");
         panneauVertical.getChildren().add(labelTextField); //permet d'afficher l'élément dans le panneau
 
-        //Case pour ajouter un label
+        //CASE AJOUTER UN LABEL
         TextField ajouterLabel = new TextField();
         panneauVertical.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
 
+        //CHECK BUTTON
         Button checkButton = new Button();
         panneauVertical.getChildren().add(checkButton); //permet d'afficher l'élément dans le panneau
 
-        //the check icon
         Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
         ImageView checkIconView = new ImageView(checkIcon);
         checkIconView.setFitHeight(10);
@@ -150,15 +150,16 @@ public class Layout extends Application {
         //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
         //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
+        //CASE OÙ SONT STOCKéS LES LABELS
         TextArea panneauLabel = new TextArea();
         panneauVertical.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.setPrefWidth(150);
         panneauLabel.setPrefHeight(300);
 
+        //DELETE BUTTON
         Button deleteButton = new Button();
         panneauVertical.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
 
-        //the delete icon
         Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
         ImageView deleteIconView = new ImageView(deleteIcon);
         deleteIconView.setFitHeight(10);
