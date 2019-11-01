@@ -50,14 +50,12 @@ public class Layout extends Application {
         // BARRE DE NAVIGATION
         //------------------------------------------------------------------
 
-        Button button1 = new Button("Upload picture");
+        Button uploadPictureButton = new Button("Upload picture");
 
-        HBox hbox = new HBox(10, button1);
+        HBox hbox = new HBox(10, uploadPictureButton);
         hbox.setPadding(new Insets(15, 12, 15, 12));
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #CDAEF3;");
-
-        //hbox.getChildren().addAll(button1, chosen);
 
         // Ajouter un bouton "aide" dans le header
         helpButton(hbox);
@@ -81,7 +79,7 @@ public class Layout extends Application {
         border.setCenter(grid);
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
-        button1.setOnAction(
+        uploadPictureButton.setOnAction(
                 event -> {
                     Image image = null;
                     ImageView imageView = new ImageView();
@@ -106,7 +104,7 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         //On crée une colonne contenant les labels
-        border.setLeft(addVBox());
+        border.setLeft(menuLabels());
 
         //------------------------------------------------------------------
         // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
@@ -124,7 +122,7 @@ public class Layout extends Application {
     /*
      * MENU GAUCHE
      */
-    private VBox addVBox() {
+    private VBox menuLabels() {
 
         VBox panneauVertical = new VBox();
         panneauVertical.setPadding(new Insets(15, 12, 15, 12));
