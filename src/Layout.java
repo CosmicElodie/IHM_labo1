@@ -34,7 +34,12 @@ import java.util.Collections;
  * provided by the JavaFX layout API.
  * The resulting UI is for demonstration purposes only and is not interactive.
  */
-public class Layout extends Application {
+public class Layout extends Application
+{
+
+    File file;
+    Image image;
+    ImageView imageView;
 
     File file;
     Image image;
@@ -163,7 +168,8 @@ public class Layout extends Application {
                     }
 
                     //Set extension filter
-                    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp", "*.bmp");
+                    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
+
                     fileChooser.getExtensionFilters().add(extFilter);
 
                     //Show open file dialog
@@ -217,25 +223,25 @@ public class Layout extends Application {
         //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
         //CASE OÙ SONT STOCKéS LES LABELS
-
         ListView panneauLabel = new ListView();
         panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.getStyleClass().add("panneauLabel");
 
         //Event qui ajoute un label dans le panneau
         addLabelButton.setOnAction( e ->
-                {
-                    if(ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
-                        if(!panneauLabel.getItems().contains(ajouterLabel.getText())) {
-                            panneauLabel.getItems().add(ajouterLabel.getText());
-                            checkLabel.setText("Label ajouté avec succès !");
-                        } else {
-                            checkLabel.setText("Déjà présent dans la liste !");
-                        }
-                    } else {
-                        checkLabel.setText("Chiffres et lettres uniquement !");
-                    }
-                });
+        {
+            if(ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
+                if(!panneauLabel.getItems().contains(ajouterLabel.getText())) {
+                    panneauLabel.getItems().add(ajouterLabel.getText());
+                    checkLabel.setText("\"" + ajouterLabel.getText() + "\" ajouté avec succès !");
+                } else {
+                    checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
+                }
+                ajouterLabel.setText(""); //case vide à nouveau
+            } else {
+                checkLabel.setText("Chiffres et lettres uniquement !");
+            }
+        });
 
         //DELETE LABEL BUTTON
         Button deleteLabelButton = new Button();
@@ -249,18 +255,26 @@ public class Layout extends Application {
         deleteLabelButton.getStyleClass().add("left-button");
         panneauLabel.getSelectionModel().select(0);
 
+        Label deleteLabel = new Label("");
+
         deleteLabelButton.setOnAction( e ->
-                {
-                    try {
-                        panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
-                    } catch(Exception ex) {
-                        System.out.println("No item selected");
-                    }
-                });
+        {
+            try {
+                panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+            } catch(Exception ex) {
+                deleteLabel.setText("Aucun label sélectionné.");
+            }
+        });
+
+        panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
+
 
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
+        VBox.setMargin(titreLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(ajouterLabel, new Insets(10, 10, 10, 10));
+        VBox.setMargin(checkLabel, new Insets(1, 10, 10, 10));
+        VBox.setMargin(deleteLabel, new Insets(1, 10, 10, 10));
         VBox.setMargin(addLabelButton, new Insets(1, 10, 1, 150));
         VBox.setMargin(deleteLabelButton, new Insets(1, 10, 1, 150));
 
@@ -311,7 +325,7 @@ public class Layout extends Application {
 
         stack.getChildren().addAll(helpIcon, helpText);
         stack.setAlignment(Pos.CENTER_RIGHT);
-        // Add offset to right for question mark to compensate for RIGHT 
+        // Add offset to right for question mark to compensate for RIGHT
         // alignment of all nodes
         StackPane.setMargin(helpText, new Insets(0, 10, 0, 0));
 
