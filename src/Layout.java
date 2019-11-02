@@ -1,4 +1,6 @@
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Sample application that shows examples of the different layout panes
@@ -197,15 +200,21 @@ public class Layout extends Application {
         //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
         //CASE OÙ SONT STOCKéS LES LABELS
-        TextArea panneauLabel = new TextArea();
+
+        //on créé un set pour éviter les duplications de label
+        ObservableSet<String> observableSet = FXCollections.observableSet();
+        ListView panneauLabel = new ListView();
         panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.getStyleClass().add("panneauLabel");
 
-        //Event qui ajouter un label dans le panneau
+        //Event qui ajoute un label dans le panneau
         checkButton.setOnAction( e ->
                 {
-                    panneauLabel.setText(ajouterLabel.getText());
-                });
+                    observableSet.addAll(Arrays.asList(ajouterLabel.getText()));
+                    panneauLabel.setItems(FXCollections.observableArrayList(observableSet));
+                }
+                );
+
         //DELETE BUTTON
         Button deleteButton = new Button();
         panneauVerticalGauche.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
@@ -216,6 +225,12 @@ public class Layout extends Application {
         deleteIconView.setFitWidth(15);
         deleteButton.setGraphic(deleteIconView);//setting icon to button
         deleteButton.getStyleClass().add("left-button");
+
+        deleteButton.setOnAction( e ->
+                {
+                    panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+                }
+        );
 
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
