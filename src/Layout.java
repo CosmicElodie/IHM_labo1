@@ -55,10 +55,6 @@ public class Layout extends Application
     File file;
     Image image;
     ImageView imageView;
-
-    File file;
-    Image image;
-    ImageView imageView;
     Button importButton;
     Button exportButton;
     int x1, y1, x2, y2 = 0;
@@ -200,7 +196,6 @@ public class Layout extends Application
 
                     //Set extension filter
                     FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
-
                     fileChooser.getExtensionFilters().add(extFilter);
 
                     //Show open file dialog
