@@ -41,6 +41,10 @@ public class Layout extends Application
     Image image;
     ImageView imageView;
 
+    File file;
+    Image image;
+    ImageView imageView;
+
     @Override
     public void start(Stage stage) throws Exception
     {
@@ -165,6 +169,7 @@ public class Layout extends Application
 
                     //Set extension filter
                     FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
+
                     fileChooser.getExtensionFilters().add(extFilter);
 
                     //Show open file dialog
@@ -262,6 +267,7 @@ public class Layout extends Application
         });
 
         panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
+
 
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
