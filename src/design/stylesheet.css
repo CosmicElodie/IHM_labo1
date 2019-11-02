@@ -54,6 +54,12 @@
     -fx-background-color: none;
 }
 
+.left-button:hover
+{
+    -fx-background-color: E4DAE2;
+}
+
+
 /* ************************************************ */
 /* COLONNE DROITE */
 /* ************************************************ */
