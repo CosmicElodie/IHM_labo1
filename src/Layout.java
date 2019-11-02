@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Sample application that shows examples of the different layout panes
@@ -34,6 +35,10 @@ import java.util.Arrays;
  * The resulting UI is for demonstration purposes only and is not interactive.
  */
 public class Layout extends Application {
+
+    File file;
+    Image image;
+    ImageView imageView;
 
     @Override
     public void start(Stage stage) throws Exception
@@ -52,7 +57,7 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         //On créé le bouton "upload picture"
-        Button uploadPictureButton = new Button("Upload picture");
+        Button uploadPictureButton = new Button("Importer une image");
         uploadPictureButton.getStyleClass().add("header-button");
 
         //On crée une barre de navigation dans le BorderPane
@@ -63,7 +68,7 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         //On met en place le corps du texte
-        border.setCenter(corpsLogiciel(uploadPictureButton, stage));
+        border.setCenter(corpsLogiciel(uploadPictureButton));
 
         //------------------------------------------------------------------
         // COLONNE GAUCHE POUR LABELS
@@ -141,7 +146,7 @@ public class Layout extends Application {
      * -> là où se charge l'image
      * @return
      */
-    private GridPane corpsLogiciel(Button uploadPictureButton, Stage stage)
+    private GridPane corpsLogiciel(Button uploadPictureButton)
     {
         //On crée le corps du logiciel (là où sera l'image)
         GridPane grid = new GridPane();
@@ -150,18 +155,26 @@ public class Layout extends Application {
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         uploadPictureButton.setOnAction(
                 event -> {
-                    Image image = null;
-                    ImageView imageView = new ImageView();
-
-                    FileChooser chooser = new FileChooser();
-                    File file2 = chooser.showOpenDialog(stage);
-                    if(file2 != null)
-                    {
-                        //Permet d'afficher l'image dans le corps de l'application
-                        image = new Image(file2.toURI().toString(), 500, 450 ,true,false);
-                        imageView.setImage(image);
-                        grid.getChildren().add(imageView);
+                    FileChooser fileChooser = new FileChooser();
+                    //Open directory from existing directory
+                    if(file != null) {
+                        File existDirectory = file.getParentFile();
+                        fileChooser.setInitialDirectory(existDirectory);
                     }
+
+                    //Set extension filter
+                    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp", "*.bmp");
+                    fileChooser.getExtensionFilters().add(extFilter);
+
+                    //Show open file dialog
+                    file = fileChooser.showOpenDialog(null);
+
+                    //Permet d'afficher l'image dans le corps de l'application
+                    grid.getChildren().remove(imageView);
+                    image = new Image(file.toURI().toString(), 500, 450 ,true,false);
+                    imageView = new ImageView();
+                    imageView.setImage(image);
+                    grid.getChildren().add(imageView);
                 }
         );
         return grid;
@@ -177,7 +190,7 @@ public class Layout extends Application {
         panneauVerticalGauche.getStyleClass().add("menuLabelsGauche-vbox");
 
 
-        //TITRE AJOUTER UN LABEL
+        //LABEL AJOUTER UN LABEL
         Label titreLabel = new Label("Ajouter un label");
         panneauVerticalGauche.getChildren().add(titreLabel); //permet d'afficher l'élément dans le panneau
 
@@ -185,58 +198,71 @@ public class Layout extends Application {
         TextField ajouterLabel = new TextField();
         panneauVerticalGauche.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
 
-        //CHECK BUTTON
-        Button checkButton = new Button();
-        panneauVerticalGauche.getChildren().add(checkButton); //permet d'afficher l'élément dans le panneau
+        //LABEL CHECK LABEL
+        Label checkLabel = new Label("");
+        panneauVerticalGauche.getChildren().add(checkLabel); //indique l'état de l'ajout d'un label
+
+        //ADD LABEL BUTTON
+        Button addLabelButton = new Button();
+        panneauVerticalGauche.getChildren().add(addLabelButton); //permet d'afficher l'élément dans le panneau
 
         Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
         ImageView checkIconView = new ImageView(checkIcon);
         checkIconView.setFitHeight(15);
         checkIconView.setFitWidth(15);
-        checkButton.setGraphic(checkIconView);//setting icon to button
-        checkButton.getStyleClass().add("left-button");
+        addLabelButton.setGraphic(checkIconView);//setting icon to button
+        addLabelButton.getStyleClass().add("left-button");
 
         //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
         //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
         //CASE OÙ SONT STOCKéS LES LABELS
 
-        //on créé un set pour éviter les duplications de label
-        ObservableSet<String> observableSet = FXCollections.observableSet();
         ListView panneauLabel = new ListView();
         panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.getStyleClass().add("panneauLabel");
 
         //Event qui ajoute un label dans le panneau
-        checkButton.setOnAction( e ->
+        addLabelButton.setOnAction( e ->
                 {
-                    observableSet.addAll(Arrays.asList(ajouterLabel.getText()));
-                    panneauLabel.setItems(FXCollections.observableArrayList(observableSet));
-                }
-                );
+                    if(ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
+                        if(!panneauLabel.getItems().contains(ajouterLabel.getText())) {
+                            panneauLabel.getItems().add(ajouterLabel.getText());
+                            checkLabel.setText("Label ajouté avec succès !");
+                        } else {
+                            checkLabel.setText("Déjà présent dans la liste !");
+                        }
+                    } else {
+                        checkLabel.setText("Chiffres et lettres uniquement !");
+                    }
+                });
 
-        //DELETE BUTTON
-        Button deleteButton = new Button();
-        panneauVerticalGauche.getChildren().add(deleteButton); //permet d'afficher l'élément dans le panneau
+        //DELETE LABEL BUTTON
+        Button deleteLabelButton = new Button();
+        panneauVerticalGauche.getChildren().add(deleteLabelButton); //permet d'afficher l'élément dans le panneau
 
         Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
         ImageView deleteIconView = new ImageView(deleteIcon);
         deleteIconView.setFitHeight(15);
         deleteIconView.setFitWidth(15);
-        deleteButton.setGraphic(deleteIconView);//setting icon to button
-        deleteButton.getStyleClass().add("left-button");
+        deleteLabelButton.setGraphic(deleteIconView);//setting icon to button
+        deleteLabelButton.getStyleClass().add("left-button");
+        panneauLabel.getSelectionModel().select(0);
 
-        deleteButton.setOnAction( e ->
+        deleteLabelButton.setOnAction( e ->
                 {
-                    panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
-                }
-        );
+                    try {
+                        panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+                    } catch(Exception ex) {
+                        System.out.println("No item selected");
+                    }
+                });
 
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(ajouterLabel, new Insets(10, 10, 10, 10));
-        VBox.setMargin(checkButton, new Insets(1, 10, 1, 150));
-        VBox.setMargin(deleteButton, new Insets(1, 10, 1, 150));
+        VBox.setMargin(addLabelButton, new Insets(1, 10, 1, 150));
+        VBox.setMargin(deleteLabelButton, new Insets(1, 10, 1, 150));
 
         //La colonne prend la longueur de la fenêtre
         //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
