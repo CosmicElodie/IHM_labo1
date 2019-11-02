@@ -1,10 +1,14 @@
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -18,6 +22,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -25,7 +30,17 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import javax.naming.Context;
+import javax.print.attribute.AttributeSet;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -39,6 +54,9 @@ public class Layout extends Application {
     File file;
     Image image;
     ImageView imageView;
+    Button importButton;
+    Button exportButton;
+    int x1, y1, x2, y2 = 0;
 
     @Override
     public void start(Stage stage) throws Exception
@@ -56,19 +74,22 @@ public class Layout extends Application {
         // BARRE DE NAVIGATION
         //------------------------------------------------------------------
 
-        //On créé le bouton "upload picture"
-        Button uploadPictureButton = new Button("Importer une image");
-        uploadPictureButton.getStyleClass().add("header-button");
+        //Import and export buttons
+        importButton = new Button("Importer une image");
+        importButton.getStyleClass().add("header-button");
+
+        exportButton = new Button("Exporter les labels");
+        exportButton.getStyleClass().add("header-button");
 
         //On crée une barre de navigation dans le BorderPane
-        border.setTop(navBar(uploadPictureButton));
+        border.setTop(navBar());
 
         //------------------------------------------------------------------
         // CORPS LOGICIEL OÙ SE TROUVE L'IMAGE
         //------------------------------------------------------------------
 
         //On met en place le corps du texte
-        border.setCenter(corpsLogiciel(uploadPictureButton));
+        border.setCenter(corpsLogiciel());
 
         //------------------------------------------------------------------
         // COLONNE GAUCHE POUR LABELS
@@ -76,7 +97,6 @@ public class Layout extends Application {
 
         //On crée une colonne contenant les labels
         border.setLeft(menuLabels());
-
 
         //------------------------------------------------------------------
         // COLONNE DROITE POUR ???
@@ -106,18 +126,29 @@ public class Layout extends Application {
         stage.show();
     }
 
+    // Dessine un rectangle
+    public void paint(Graphics g2d, int x1, int y1, int x2, int y2) {
+        g2d.setColor(java.awt.Color.RED);
+        int px = Math.min(x1, x2);
+        int py = Math.min(y1, y2);
+        int pw = Math.abs(x1 - x2);
+        int ph = Math.abs(y1 - y2);
+        g2d.drawRect(px, py, pw, ph);
+    }
+
     /**
      * NAVIGATION
      * -> upload button
      * -> help button
      * @return
      */
-    private HBox navBar(Button uploadPictureButton)
+    private HBox navBar()
     {
-        HBox hbox = new HBox(10, uploadPictureButton);
+        HBox hbox = new HBox(10);
         hbox.setPadding(new Insets(15, 15, 15, 15));
         hbox.setSpacing(10);   // Gap between nodes
         hbox.getStyleClass().add("footer-header-hbox");
+        hbox.getChildren().addAll(importButton, exportButton);
 
         // Ajouter un bouton "aide" dans le header
         helpButton(hbox);
@@ -146,14 +177,14 @@ public class Layout extends Application {
      * -> là où se charge l'image
      * @return
      */
-    private GridPane corpsLogiciel(Button uploadPictureButton)
+    private GridPane corpsLogiciel()
     {
         //On crée le corps du logiciel (là où sera l'image)
         GridPane grid = new GridPane();
         grid.getStyleClass().add("corps-gridPane");
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
-        uploadPictureButton.setOnAction(
+        importButton.setOnAction(
                 event -> {
                     FileChooser fileChooser = new FileChooser();
                     //Open directory from existing directory
@@ -169,12 +200,89 @@ public class Layout extends Application {
                     //Show open file dialog
                     file = fileChooser.showOpenDialog(null);
 
-                    //Permet d'afficher l'image dans le corps de l'application
-                    grid.getChildren().remove(imageView);
-                    image = new Image(file.toURI().toString(), 500, 450 ,true,false);
-                    imageView = new ImageView();
-                    imageView.setImage(image);
-                    grid.getChildren().add(imageView);
+                    if(file != null) {
+                        //Permet d'afficher l'image dans le corps de l'application
+                        grid.getChildren().remove(imageView);
+                        image = new Image(file.toURI().toString(), 500, 450, true, false);
+                        imageView = new ImageView();
+                        imageView.setImage(image);
+                        grid.getChildren().add(imageView);
+
+                        // Permet de dessiner des rectangles
+                        imageView.setOnMouseEntered(e-> {
+                            //
+                        });
+
+                        imageView.setOnMouseExited(e-> {
+                            //
+                        });
+
+                        imageView.setOnMousePressed(e->{
+                            this.x1 = (int)e.getX();
+                            this.y1 = (int)e.getY();
+                        });
+
+                        imageView.setOnMouseDragged(e-> {
+                            this.x2 = (int)e.getX();
+                            this.y2 = (int)e.getY();
+                            //paint(g2d, x1, y1, x2, y2);
+                        });
+
+                        imageView.setOnMouseReleased(e-> {
+                            this.x2 = (int)e.getX();
+                            this.y2 = (int)e.getY();
+                            //paint(g2d, x1, y1, x2, y2);
+                        });
+                    }
+                }
+        );
+
+        exportButton.setOnAction(
+                event -> {
+                    /*
+                    try {
+                        BufferedImage bufferedImage = ImageIO.read(file);
+                        String format = "";
+                        int i = file.getName().lastIndexOf('.');
+                        if (i > 0) {
+                            format = file.getName().substring(i+1);
+                        }
+                        File output = new File(file.getName());
+                        ImageIO.write(bufferedImage, format, output);
+                    } catch (Exception e) {
+                        System.out.println("Exception while saving the image");
+                    }
+                    */
+
+                    // Récupère le nom de l'image sans son extension l'extension
+                    String format = "";
+                    int i = file.getName().lastIndexOf('.');
+                    if (i > 0) {
+                        format = file.getName().substring(i);
+                    }
+                    String fileName = file.getName().replace(format,"");
+
+                    // Sauvegarde l'output à la racine du projet
+                    try (PrintWriter pw = new PrintWriter(new File(fileName + "Output.csv"))) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Image");
+                        sb.append(',');
+                        sb.append("Objects");
+                        sb.append(',');
+                        sb.append("Coordinates");
+                        sb.append('\n');
+
+                        sb.append(file.getPath());
+                        sb.append(',');
+                        sb.append("Yes");
+                        sb.append(',');
+                        sb.append("Yes");
+                        sb.append('\n');
+
+                        pw.write(sb.toString());
+                    } catch (Exception e) {
+                        System.out.println("Exception while saving the output file");
+                    }
                 }
         );
         return grid;
@@ -319,7 +427,6 @@ public class Layout extends Application {
         HBox.setHgrow(stack, Priority.ALWAYS);
 
     }
-
 
     /*
      * BOUTONS SAUVEGARDER ET ANNULER (pas encore utilisés)
