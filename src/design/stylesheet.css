@@ -1,0 +1,74 @@
+/* ************************************************ */
+                  /* GENERAL */
+/* ************************************************ */
+.general-borderPanel
+{
+    -fx-background-color: FFFFFF;
+}
+
+/* ************************************************ */
+                    /* HEADER */
+/* ************************************************ */
+
+.header-button
+{
+    -fx-background-color: #E9DBFA;
+    -fx-background-radius: 15px;
+}
+
+.header-button:hover
+{
+    -fx-background-color: #E4D5F7;
+}
+
+/* ************************************************ */
+                    /* BODY */
+/* ************************************************ */
+
+.corps-gridPane
+{
+    -fx-background-color: #DEEAFF;
+    -fx-pref-width:400;
+    -fx-padding: 15,15,15,15;
+    -fx-vgap: 10;
+    -fx-hgap: 10;
+}
+
+/* ************************************************ */
+            /* COLONNE GAUCHE */
+/* ************************************************ */
+.menuLabelsGauche-vbox
+{
+    -fx-background-color: #FFDEF7;
+    -fx-padding: 15 15 15 15;
+}
+
+.panneauLabel
+{
+    -fx-pref-width: 150;
+    -fx-pref-height: 300;
+}
+
+.left-button
+{
+    -fx-background-color: none;
+}
+
+/* ************************************************ */
+/* COLONNE DROITE */
+/* ************************************************ */
+.menuLabelsDroite-vbox
+{
+    -fx-background-color: #FFDEF7;
+    -fx-padding: 15 15 15 15;
+}
+
+/* ************************************************ */
+                    /* FOOTER */
+/* ************************************************ */
+
+.footer-header-hbox
+{
+    -fx-background-color: #CDAEF3;
+    -fx-alignment: center;
+}

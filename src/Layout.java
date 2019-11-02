@@ -7,12 +7,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -44,7 +42,7 @@ public class Layout extends Application {
         BorderPane border = new BorderPane();
 
         //fond blanc de base
-        border.setStyle("-fx-background-color: FFFFFF;");
+        border.getStyleClass().add("general-borderPanel");
 
         //------------------------------------------------------------------
         // BARRE DE NAVIGATION
@@ -52,6 +50,7 @@ public class Layout extends Application {
 
         //On créé le bouton "upload picture"
         Button uploadPictureButton = new Button("Upload picture");
+        uploadPictureButton.getStyleClass().add("header-button");
 
         //On crée une barre de navigation dans le BorderPane
         border.setTop(navBar(uploadPictureButton));
@@ -93,6 +92,7 @@ public class Layout extends Application {
         //border.setRight(addTilePane());
 
         Scene scene = new Scene(border,950,600);
+        scene.getStylesheets().add("/design/stylesheet.css");
         stage.setScene(scene);
         stage.setTitle("BeSt ApP Ev4");
         stage.show();
@@ -109,7 +109,7 @@ public class Layout extends Application {
         HBox hbox = new HBox(10, uploadPictureButton);
         hbox.setPadding(new Insets(15, 15, 15, 15));
         hbox.setSpacing(10);   // Gap between nodes
-        hbox.setStyle("-fx-background-color: #CDAEF3;");
+        hbox.getStyleClass().add("footer-header-hbox");
 
         // Ajouter un bouton "aide" dans le header
         helpButton(hbox);
@@ -124,12 +124,11 @@ public class Layout extends Application {
     {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(15, 15, 15, 15));
-        hbox.setStyle("-fx-background-color: #CDAEF3;");
+        hbox.getStyleClass().add("footer-header-hbox");
 
         Label copyright = new Label();
         copyright.setText("Copyright Crüll Loris, Lagier Elodie");
         hbox.getChildren().add(copyright);
-        hbox.setAlignment(Pos.CENTER);
 
         return hbox;
     }
@@ -143,12 +142,7 @@ public class Layout extends Application {
     {
         //On crée le corps du logiciel (là où sera l'image)
         GridPane grid = new GridPane();
-
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(15, 15, 15, 15));
-        grid.setStyle("-fx-background-color: #DEEAFF;");
-        grid.setPrefWidth(400);
+        grid.getStyleClass().add("corps-gridPane");
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         uploadPictureButton.setOnAction(
@@ -167,7 +161,6 @@ public class Layout extends Application {
                     }
                 }
         );
-
         return grid;
     }
 
@@ -178,9 +171,8 @@ public class Layout extends Application {
     private VBox menuLabels() {
 
         VBox panneauVerticalGauche = new VBox();
-        panneauVerticalGauche.setStyle("-fx-background-color: #FFDEF7;"); //rose
+        panneauVerticalGauche.getStyleClass().add("menuLabelsGauche-vbox");
 
-        panneauVerticalGauche.setPadding(new Insets(15, 15, 15, 15));
 
         //TITRE AJOUTER UN LABEL
         Label titreLabel = new Label("Ajouter un label");
@@ -196,9 +188,10 @@ public class Layout extends Application {
 
         Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
         ImageView checkIconView = new ImageView(checkIcon);
-        checkIconView.setFitHeight(10);
-        checkIconView.setFitWidth(10);
+        checkIconView.setFitHeight(15);
+        checkIconView.setFitWidth(15);
         checkButton.setGraphic(checkIconView);//setting icon to button
+        checkButton.getStyleClass().add("left-button");
 
         //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
         //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
@@ -206,8 +199,7 @@ public class Layout extends Application {
         //CASE OÙ SONT STOCKéS LES LABELS
         TextArea panneauLabel = new TextArea();
         panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
-        panneauLabel.setPrefWidth(150);
-        panneauLabel.setPrefHeight(300);
+        panneauLabel.getStyleClass().add("panneauLabel");
 
         //Event qui ajouter un label dans le panneau
         checkButton.setOnAction( e ->
@@ -220,9 +212,10 @@ public class Layout extends Application {
 
         Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
         ImageView deleteIconView = new ImageView(deleteIcon);
-        deleteIconView.setFitHeight(10);
-        deleteIconView.setFitWidth(10);
+        deleteIconView.setFitHeight(15);
+        deleteIconView.setFitWidth(15);
         deleteButton.setGraphic(deleteIconView);//setting icon to button
+        deleteButton.getStyleClass().add("left-button");
 
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
@@ -243,8 +236,7 @@ public class Layout extends Application {
     private VBox menuDroite()
     {
         VBox panneauVerticalDroit = new VBox();
-        panneauVerticalDroit.setStyle("-fx-background-color: #FFDEF7;"); //rose
-        panneauVerticalDroit.setPadding(new Insets(15, 15, 15, 15));
+        panneauVerticalDroit.getStyleClass().add("menuLabelsDroite-vbox");
 
         //CASE AJOUTER UN LABEL
         TextField ajouterLabel = new TextField();
