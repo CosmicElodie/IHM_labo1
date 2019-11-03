@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.awt.*;
 import java.io.File;
@@ -101,7 +102,9 @@ public class Layout extends Application {
 
         scene.getStylesheets().add("/design/stylesheet.css");
         stage.setScene(scene);
+
         stage.setTitle("IHM - Labo1");
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
     }
 
@@ -365,8 +368,8 @@ public class Layout extends Application {
         //Permet de quitter l'application
         Image quitIcon = new Image(getClass().getResourceAsStream("/images/quit.png"));
         ImageView quitIconView = new ImageView(quitIcon);
-        quitIconView.setFitHeight(15);
-        quitIconView.setFitWidth(15);
+        quitIconView.setFitHeight(21);
+        quitIconView.setFitWidth(21);
         quitButton.setGraphic(quitIconView);//setting icon to button
         quitButton.setAlignment(Pos.CENTER_RIGHT);
 
@@ -382,7 +385,9 @@ public class Layout extends Application {
                 alert.setTitle("Quitter l'application");
                 alert.setHeaderText("");
                 alert.setContentText("Vous êtes sur le point de quitter l'application sans avoir sauvegardé.");
-
+                
+                //enlève les boutons de base de la fenêtre.
+                alert.initStyle(StageStyle.UNDECORATED);
                 ButtonType oui = new ButtonType("Quitter");
                 ButtonType non = new ButtonType("Annuler");
 
