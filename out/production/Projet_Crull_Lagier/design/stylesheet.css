@@ -9,10 +9,19 @@
 /* ************************************************ */
                     /* HEADER */
 /* ************************************************ */
-
+.header-hbox
+{
+    -fx-background-color: #CDAEF3;
+}
 .header-button
 {
     -fx-background-color: #E9DBFA;
+    -fx-background-radius: 15px;
+}
+
+.header-quit-button
+{
+    -fx-background-color: none;
     -fx-background-radius: 15px;
 }
 
@@ -77,4 +86,12 @@
 {
     -fx-background-color: #CDAEF3;
     -fx-alignment: center;
+}
+
+/* ************************************************ */
+
+.alert.confirmation.dialog-pane {
+    -fx-graphic: url("/images/julien.png");
+    -fx-alignment: center;
+    -fx-background-color: #CDAEF3;
 }

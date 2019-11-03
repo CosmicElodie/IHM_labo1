@@ -9,14 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -27,10 +19,11 @@ import java.io.PrintWriter;
 public class Layout extends Application {
 
     File file;
-    boolean fichierExporte; //sert pour s'assurer que l'user ait bien sauvegarder avant de quitter.
+    boolean fichierExporte; //sert à s'assurer que l'utilisateur a bien sauvegardé avant de quitter
 
     Image image;
     ImageView imageView;
+    DrawingBoard drawingBoard; // Solution provisoire : crée une nouvelle fenêtre par dessus l'actuelle
 
     Button importButton;
     Button exportButton;
@@ -38,11 +31,7 @@ public class Layout extends Application {
 
     ListView panneauLabel;
     Label checkLabel;
-
     Label messageImporterExporter;
-
-
-    int x1, y1, x2, y2 = 0;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -104,21 +93,16 @@ public class Layout extends Application {
         // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
         //------------------------------------------------------------------
 
-        Scene scene = new Scene(border, 950, 600);
+        // Pas beau : définit la taille de la fenêtre au maximum pour la superposition correcte de la fenêtre de dessin
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double screenWidth = screenSize.getWidth();
+        double screenHeight = screenSize.getHeight() - 65;
+        Scene scene = new Scene(border, screenWidth, screenHeight);
+
         scene.getStylesheets().add("/design/stylesheet.css");
         stage.setScene(scene);
-        stage.setTitle("BeSt ApP Ev4");
+        stage.setTitle("IHM - Labo1");
         stage.show();
-    }
-
-    // Dessine un rectangle
-    public void paint(Graphics g2d, int x1, int y1, int x2, int y2) {
-        g2d.setColor(java.awt.Color.RED);
-        int px = Math.min(x1, x2);
-        int py = Math.min(y1, y2);
-        int pw = Math.abs(x1 - x2);
-        int ph = Math.abs(y1 - y2);
-        g2d.drawRect(px, py, pw, ph);
     }
 
     /**
@@ -139,25 +123,9 @@ public class Layout extends Application {
         hbox.getChildren().addAll(importButton, exportButton, messageImporterExporter);
 
         exportButton.setOnAction(
-                event -> {
-
-                    /*
-                    try {
-                        BufferedImage bufferedImage = ImageIO.read(file);
-                        String format = "";
-                        int i = file.getName().lastIndexOf('.');
-                        if (i > 0) {
-                            format = file.getName().substring(i+1);
-                        }
-                        File output = new File(file.getName());
-                        ImageIO.write(bufferedImage, format, output);
-                    } catch (Exception e) {
-                        messageImporterExporter.setText("L'image n'a pas pu être importée.");
-                    }
-                    */
-
-
-                    // Récupère le nom de l'image sans son extension l'extension
+            event -> {
+                // Récupère le nom de l'image sans son extension
+                if (file != null) {
                     String format = "";
                     int i = file.getName().lastIndexOf('.');
                     if (i > 0) {
@@ -191,6 +159,7 @@ public class Layout extends Application {
                         messageImporterExporter.setText("L'output n'a pas correctement été généré");
                     }
                 }
+            }
         );
 
 
@@ -229,64 +198,41 @@ public class Layout extends Application {
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         importButton.setOnAction(
-                event -> {
-                    FileChooser fileChooser = new FileChooser();
-                    fichierExporte = false;
-                    messageImporterExporter.setText("");
-                    //on supprime les labels de la fenêtre ensuite.
-                    panneauLabel.getItems().clear();
-                    checkLabel.setText("");
+            event -> {
+                FileChooser fileChooser = new FileChooser();
+                fichierExporte = false;
+                messageImporterExporter.setText("");
+                //on supprime les labels de la fenêtre ensuite.
+                panneauLabel.getItems().clear();
+                checkLabel.setText("");
 
-                    if (file != null) {
-                        File existDirectory = file.getParentFile();
-                        fileChooser.setInitialDirectory(existDirectory);
-                    }
-
-                    //permet d'afficher les extensions qu'on accepte de sélectionner.
-
-                    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
-                    fileChooser.getExtensionFilters().add(extFilter);
-
-                    //Ouvre la fenêtre du gestionnaire de fichiers.
-                    file = fileChooser.showOpenDialog(null);
-
-                    if (file != null) {
-                        //Permet d'afficher l'image dans le corps de l'application
-                        grid.getChildren().remove(imageView);
-                        image = new Image(file.toURI().toString(), 500, 450, true, false);
-                        imageView = new ImageView();
-                        imageView.setImage(image);
-                        grid.getChildren().add(imageView);
-
-
-                        //CODE POUR DESSINER RECTANGLE
-                        // Permet de dessiner des rectangles
-                        imageView.setOnMouseEntered(e -> {
-                            //
-                        });
-
-                        imageView.setOnMouseExited(e -> {
-                            //
-                        });
-
-                        imageView.setOnMousePressed(e -> {
-                            this.x1 = (int) e.getX();
-                            this.y1 = (int) e.getY();
-                        });
-
-                        imageView.setOnMouseDragged(e -> {
-                            this.x2 = (int) e.getX();
-                            this.y2 = (int) e.getY();
-                            //paint(g2d, x1, y1, x2, y2);
-                        });
-
-                        imageView.setOnMouseReleased(e -> {
-                            this.x2 = (int) e.getX();
-                            this.y2 = (int) e.getY();
-                            //paint(g2d, x1, y1, x2, y2);
-                        });
-                    }
+                if (file != null) {
+                    File existDirectory = file.getParentFile();
+                    fileChooser.setInitialDirectory(existDirectory);
                 }
+
+                //permet d'afficher les extensions qu'on accepte de sélectionner.
+
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
+                fileChooser.getExtensionFilters().add(extFilter);
+
+                //Ouvre la fenêtre du gestionnaire de fichiers.
+                file = fileChooser.showOpenDialog(null);
+
+                if (file != null) {
+                    //Permet d'afficher l'image dans le corps de l'application
+                    grid.getChildren().remove(imageView);
+                    image = new Image(file.toURI().toString()/*, 500, 450, true, false*/);
+                    imageView = new ImageView();
+                    imageView.setImage(image);
+                    grid.getChildren().add(imageView);
+                    // Affiche la fenêtre de dessin, la détruit si elle existait avant
+                    if(drawingBoard != null) {
+                        drawingBoard.dispose();
+                    }
+                    drawingBoard = new DrawingBoard((int)image.getWidth(), (int)image.getHeight());
+                }
+            }
         );
 
         return grid;
@@ -437,7 +383,7 @@ public class Layout extends Application {
                 alert.setHeaderText("");
                 alert.setContentText("Vous êtes sur le point de quitter l'application sans avoir sauvegardé.");
 
-                ButtonType oui = new ButtonType("Ok desu.");
+                ButtonType oui = new ButtonType("Quitter");
                 ButtonType non = new ButtonType("Annuler");
 
                 alert.getButtonTypes().setAll(oui, non);
