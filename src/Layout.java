@@ -37,6 +37,7 @@ public class Layout extends Application {
     Button quitButton;
 
     ListView panneauLabel;
+    Label checkLabel;
 
     Label messageImporterExporter;
 
@@ -184,8 +185,6 @@ public class Layout extends Application {
 
                         pw.write(sb.toString());
 
-                        //on supprime les labels de la fenêtre ensuite.
-                        //panneauLabel.getItems().clear();
                         messageImporterExporter.setText("L'output a été correctement généré.");
                     } catch (Exception e) {
                         fichierExporte = false;
@@ -232,6 +231,11 @@ public class Layout extends Application {
         importButton.setOnAction(
                 event -> {
                     FileChooser fileChooser = new FileChooser();
+                    fichierExporte = false;
+                    messageImporterExporter.setText("");
+                    //on supprime les labels de la fenêtre ensuite.
+                    panneauLabel.getItems().clear();
+                    checkLabel.setText("");
 
                     if (file != null) {
                         File existDirectory = file.getParentFile();
@@ -308,7 +312,7 @@ public class Layout extends Application {
         panneauVerticalGauche.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
 
         //LABEL CHECK LABEL
-        Label checkLabel = new Label("");
+        checkLabel = new Label("");
         panneauVerticalGauche.getChildren().add(checkLabel); //indique l'état de l'ajout d'un label
 
         //ADD LABEL BUTTON
