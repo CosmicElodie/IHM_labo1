@@ -35,7 +35,7 @@ public class Layout extends Application {
     Label messageImporterExporter;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
@@ -165,11 +165,8 @@ public class Layout extends Application {
             }
         );
 
-
-
         // Ajouter un bouton "aide" dans le header
         quitButton(hbox);
-
         return hbox;
     }
 
@@ -323,8 +320,7 @@ public class Layout extends Application {
         });
 
         panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
-
-
+        
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(titreLabel, new Insets(10, 10, 10, 10));
