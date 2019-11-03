@@ -19,7 +19,7 @@ public class DrawingBoard extends JFrame {
         this.add(new PaintSurface());
         this.setUndecorated(true);
         this.setBackground(new Color(0,0,0,0.1f)); // Pas beau, mais procure un fond transparent
-        this.setLocation(235, 95); // Pas beau, nécessite la fenêtre de base en plein écran pour un superpositionnement parfait
+        this.setLocation(235, 75); // Pas beau, nécessite la fenêtre de base en plein écran pour un superpositionnement parfait
         this.setAlwaysOnTop(true); // Pas beau, reste devant même si la fenêtre de base se ferme
         this.setVisible(true);
     }
