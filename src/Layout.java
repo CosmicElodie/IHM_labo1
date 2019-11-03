@@ -24,15 +24,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 
-/**
- * Sample application that shows examples of the different layout panes
- * provided by the JavaFX layout API.
- * The resulting UI is for demonstration purposes only and is not interactive.
- */
 public class Layout extends Application {
 
     File file;
-    PrintWriter fichierExporte; //sert pour s'assurer que l'user ait bien sauvegarder avant de quitter.
+    boolean fichierExporte; //sert pour s'assurer que l'user ait bien sauvegarder avant de quitter.
 
     Image image;
     ImageView imageView;
@@ -171,6 +166,7 @@ public class Layout extends Application {
 
                     // Sauvegarde l'output à la racine du projet
                     try (PrintWriter pw = new PrintWriter(new File(fileName + "Output.csv"))) {
+                        fichierExporte = true;
                         StringBuilder sb = new StringBuilder();
                         sb.append("Image");
                         sb.append(',');
@@ -192,6 +188,7 @@ public class Layout extends Application {
                         //panneauLabel.getItems().clear();
                         messageImporterExporter.setText("L'output a été correctement généré.");
                     } catch (Exception e) {
+                        fichierExporte = false;
                         messageImporterExporter.setText("L'output n'a pas correctement été généré");
                     }
                 }
@@ -424,7 +421,7 @@ public class Layout extends Application {
         quitButton.setAlignment(Pos.CENTER_RIGHT);
 
         quitButton.setOnAction(event -> {
-            if(fichierExporte != null)
+            if(fichierExporte)
             {
                 Stage stage = (Stage) quitButton.getScene().getWindow();
                 stage.close();
@@ -432,8 +429,9 @@ public class Layout extends Application {
             else
             {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Vous êtes sur le point de quitter l'application.");
+                alert.setTitle("Quitter l'application");
                 alert.setHeaderText("");
+                alert.setContentText("Vous êtes sur le point de quitter l'application sans avoir sauvegardé.");
 
                 ButtonType oui = new ButtonType("Ok desu.");
                 ButtonType non = new ButtonType("Annuler");
@@ -444,7 +442,6 @@ public class Layout extends Application {
                 dialogPane.getStylesheets().add(
                         getClass().getResource("/design/stylesheet.css").toExternalForm());
 
-                alert.getDialogPane().setPrefSize(0, 0);
 
                 alert.showAndWait();
                 if (alert.getResult() == oui) {
