@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 
 public class Layout extends Application {
 
+    private Stage window;
     private File file;
     private boolean fichierExporte; //sert à s'assurer que l'utilisateur a bien sauvegardé avant de quitter
 
@@ -41,8 +43,12 @@ public class Layout extends Application {
     private Label checkLabel;
     private Label messageImporterExporter;
 
+    Point startDrag, endDrag;
+    Line horizontalLine, verticalLine;
+
     @Override
     public void start(Stage stage) {
+        window = stage;
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
@@ -107,11 +113,11 @@ public class Layout extends Application {
         Scene scene = new Scene(border, screenWidth, screenHeight);
 
         scene.getStylesheets().add("/design/stylesheet.css");
-        stage.setScene(scene);
+        window.setScene(scene);
 
-        stage.setTitle("IHM - Labo1");
-        stage.initStyle(StageStyle.UNDECORATED);
-        stage.show();
+        window.setTitle("IHM - Labo1");
+        window.initStyle(StageStyle.UNDECORATED);
+        window.show();
 
         /*
         // Réduit ou agrandit toutes les fenêtres d'un coup
@@ -214,10 +220,10 @@ public class Layout extends Application {
      *
      * @return
      */
-    private GridPane corpsLogiciel() {
+    private StackPane corpsLogiciel() {
         //On crée le corps du logiciel (là où sera l'image)
-        GridPane grid = new GridPane();
-        grid.getStyleClass().add("corps-gridPane");
+        StackPane sp = new StackPane();
+        sp.getStyleClass().add("corps-gridPane");
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         importButton.setOnAction(
@@ -244,23 +250,80 @@ public class Layout extends Application {
                     checkLabel.setText("");
 
                     //Permet d'afficher l'image dans le corps de l'application
-                    grid.getChildren().remove(imageView);
-                    image = new Image(file.toURI().toString(), grid.getWidth(), grid.getHeight(), true, false);
+                    sp.getChildren().remove(imageView);
+                    image = new Image(file.toURI().toString(), sp.getWidth(), sp.getHeight() - 30, true, false);
                     imageView = new ImageView();
                     imageView.setImage(image);
-                    grid.getChildren().add(imageView);
+                    sp.getChildren().add(imageView);
+                    sp.setAlignment(imageView, Pos.TOP_LEFT);
+
+                    verticalLine = new Line(0, 0, 0, 0);
+                    horizontalLine = new Line(0, 0, 0, 0);
+                    sp.getChildren().add(verticalLine);
+                    sp.getChildren().add(horizontalLine);
+                    sp.setAlignment(verticalLine, Pos.TOP_LEFT);
+                    sp.setAlignment(horizontalLine, Pos.TOP_LEFT);
 
                     // Affiche la fenêtre de dessin, la détruit si elle existait avant
                     if(drawingBoard != null) {
                         drawingBoard.dispose();
                     }
                     drawingBoard = new DrawingBoard((int)image.getWidth(), (int)image.getHeight());
-                    drawingBoard.setAlwaysOnTop(false);
+                    
+                    /*
+                    // Test d'incorporation du code à l'imageView directement
+
+                    imageView.setOnMousePressed(e -> {
+                        startDrag = new Point((int)e.getX(), (int)e.getY());
+                        endDrag = startDrag;
+                    });
+
+                    imageView.setOnMouseReleased(e -> {
+                        // En cas de relachement en dehors de l'image, le carré se dessine en bordure
+                        if(endDrag.x < 0) endDrag.x = 0;
+                        if(endDrag.x > image.getWidth()) endDrag.x = (int)image.getWidth();
+                        if(endDrag.y < 0) endDrag.y = 0;
+                        if(endDrag.y > image.getHeight()) endDrag.y = (int)image.getHeight();
+
+                        Rectangle rectangle = new Rectangle(Math.min(startDrag.x, endDrag.x), Math.min(startDrag.y, endDrag.y),
+                                                            Math.abs(startDrag.x - endDrag.x), Math.abs(startDrag.y - endDrag.y));
+                        sp.setAlignment(rectangle, Pos.TOP_LEFT);
+                        rectangle.setTranslateX(Math.min(startDrag.x, endDrag.x));
+                        rectangle.setTranslateY(Math.min(startDrag.y, endDrag.y));
+                        sp.getChildren().add(rectangle);
+                    });
+
+                    imageView.setOnMouseDragged(e -> {
+                        endDrag = new Point((int)e.getX(), (int)e.getY());
+                    });
+
+                    imageView.setOnMouseMoved(e -> {
+                        sp.getChildren().remove(verticalLine);
+                        sp.getChildren().remove(horizontalLine);
+                        verticalLine = null;
+                        horizontalLine = null;
+                        verticalLine = new Line(0, 0, 0, image.getHeight());
+                        verticalLine.setStrokeWidth(5);
+                        horizontalLine = new Line(0, 0, image.getWidth(), 0);
+                        horizontalLine.setStrokeWidth(5);
+                        sp.getChildren().add(verticalLine);
+                        sp.getChildren().add(horizontalLine);
+                        sp.setAlignment(verticalLine, Pos.TOP_LEFT);
+                        sp.setAlignment(horizontalLine, Pos.TOP_LEFT);
+                        verticalLine.setTranslateX(e.getX());
+                        horizontalLine.setTranslateY(e.getY());
+                    });
+
+                    imageView.setOnMouseExited(e -> {
+                        sp.getChildren().remove(verticalLine);
+                        sp.getChildren().remove(horizontalLine);
+                    });
+                     */
                 }
             }
         );
 
-        return grid;
+        return sp;
     }
 
     /**
