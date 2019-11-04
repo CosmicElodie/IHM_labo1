@@ -27,7 +27,7 @@ public class DrawingBoard extends JFrame {
         Point startDrag, endDrag;
         Line2D horizontalLine, verticalLine;
 
-        public PaintSurface() {
+        private PaintSurface() {
             this.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     startDrag = new Point(e.getX(), e.getY());
@@ -36,8 +36,19 @@ public class DrawingBoard extends JFrame {
                 }
 
                 public void mouseReleased(MouseEvent e) {
-                    Shape r = makeRectangle(startDrag.x, startDrag.y, e.getX(), e.getY());
+                    int x = e.getX();
+                    int y = e.getY();
+
+                    // En cas de relachement en dehors de l'image, le carré se dessine en bordure
+                    if(endDrag.x < 0) x = 0;
+                    if(endDrag.x > imageWidth) x = imageWidth;
+                    if(endDrag.y < 0) y = 0;
+                    if(endDrag.y > imageHeight) y = imageHeight;
+
+                    Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
                     shapes.add(r);
+                    // TODO : associer le rectangle à un label (via une liste par exemple)
+                    // pour pouvoir récupérer ses 4 coordonnées et mettre tout ça dans le fichier d'output
                     startDrag = null;
                     endDrag = null;
                     repaint();
@@ -69,9 +80,8 @@ public class DrawingBoard extends JFrame {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             Color[] colors = { Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK}; // Possibilité d'ajouter d'autres couleurs
             int colorIndex = 0;
-
             g2.setStroke(new BasicStroke(3));
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
             // Affiche les rectangles terminés
             for (Shape s : shapes) {
@@ -81,6 +91,7 @@ public class DrawingBoard extends JFrame {
 
             // Affiche les lignes verticales et horizontales
             if (verticalLine != null && horizontalLine != null) {
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
                 g2.setPaint(Color.ORANGE);
                 g2.draw(verticalLine);
                 g2.draw(horizontalLine);
@@ -88,6 +99,7 @@ public class DrawingBoard extends JFrame {
 
             // Affiche le rectangle en cours de dessin
             if (startDrag != null && endDrag != null) {
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
                 g2.setPaint(Color.ORANGE);
                 Shape r = makeRectangle(startDrag.x, startDrag.y, endDrag.x, endDrag.y);
                 g2.draw(r);
@@ -96,8 +108,6 @@ public class DrawingBoard extends JFrame {
 
         private Rectangle2D.Float makeRectangle(int x1, int y1, int x2, int y2) {
             return new Rectangle2D.Float(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x1 - x2), Math.abs(y1 - y2));
-            // TODO : associer le rectangle à un label (via une liste par exemple)
-            // pour pouvoir récupérer ses 4 coordonnées et mettre tout ça dans le fichier d'output
         }
 
         private Line2D.Float makeHorizontalLine(int y) {

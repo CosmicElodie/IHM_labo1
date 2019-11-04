@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,13 +10,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javax.swing.text.View;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class Layout extends Application {
 
@@ -50,10 +57,10 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         //Import and export buttons
-        importButton = new Button("Select image");
+        importButton = new Button("Sélectionner une image");
         importButton.getStyleClass().add("header-button");
 
-        exportButton = new Button("Save");
+        exportButton = new Button("Exporter les labels");
         exportButton.getStyleClass().add("header-button");
 
         quitButton = new Button();
@@ -95,9 +102,8 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         // Pas beau : définit la taille de la fenêtre au maximum pour la superposition correcte de la fenêtre de dessin
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        double screenWidth = screenSize.getWidth();
-        double screenHeight = screenSize.getHeight() - 45;
+        double screenWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 45;
         Scene scene = new Scene(border, screenWidth, screenHeight);
 
         scene.getStylesheets().add("/design/stylesheet.css");
@@ -219,9 +225,6 @@ public class Layout extends Application {
                 FileChooser fileChooser = new FileChooser();
                 fichierExporte = false;
                 messageImporterExporter.setText("");
-                //on supprime les labels de la fenêtre ensuite.
-                panneauLabel.getItems().clear();
-                checkLabel.setText("");
 
                 if (file != null) {
                     File existDirectory = file.getParentFile();
@@ -229,7 +232,6 @@ public class Layout extends Application {
                 }
 
                 //permet d'afficher les extensions qu'on accepte de sélectionner.
-
                 FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
                 fileChooser.getExtensionFilters().add(extFilter);
 
@@ -237,12 +239,17 @@ public class Layout extends Application {
                 file = fileChooser.showOpenDialog(null);
 
                 if (file != null) {
+                    //On supprime les labels de la fenêtre ensuite
+                    panneauLabel.getItems().clear();
+                    checkLabel.setText("");
+
                     //Permet d'afficher l'image dans le corps de l'application
                     grid.getChildren().remove(imageView);
-                    image = new Image(file.toURI().toString()/*, 500, 450, true, false*/);
+                    image = new Image(file.toURI().toString(), grid.getWidth(), grid.getHeight(), true, false);
                     imageView = new ImageView();
                     imageView.setImage(image);
                     grid.getChildren().add(imageView);
+
                     // Affiche la fenêtre de dessin, la détruit si elle existait avant
                     if(drawingBoard != null) {
                         drawingBoard.dispose();
@@ -398,7 +405,7 @@ public class Layout extends Application {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Quitter l'application");
                 alert.setHeaderText("");
-                alert.setContentText("Vous êtes sur le point de quitter l'application sans avoir sauvegardé.");
+                alert.setContentText("Tous les labels n'ont pas été exportés. Souhaitez-vous vraiment quitter ?");
                 
                 //enlève les boutons de base de la fenêtre.
                 alert.initStyle(StageStyle.UNDECORATED);
