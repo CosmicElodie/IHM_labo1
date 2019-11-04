@@ -19,20 +19,20 @@ import java.io.PrintWriter;
 
 public class Layout extends Application {
 
-    File file;
-    boolean fichierExporte; //sert à s'assurer que l'utilisateur a bien sauvegardé avant de quitter
+    private File file;
+    private boolean fichierExporte; //sert à s'assurer que l'utilisateur a bien sauvegardé avant de quitter
 
-    Image image;
-    ImageView imageView;
-    DrawingBoard drawingBoard; // Solution provisoire : crée une nouvelle fenêtre par dessus l'actuelle
+    private Image image;
+    private ImageView imageView;
+    private DrawingBoard drawingBoard; // Solution provisoire : crée une nouvelle fenêtre par dessus l'actuelle
 
-    Button importButton;
-    Button exportButton;
-    Button quitButton;
+    private Button importButton;
+    private Button exportButton;
+    private Button quitButton;
 
-    ListView panneauLabel;
-    Label checkLabel;
-    Label messageImporterExporter;
+    private ListView panneauLabel;
+    private Label checkLabel;
+    private Label messageImporterExporter;
 
     @Override
     public void start(Stage stage) {
@@ -106,6 +106,23 @@ public class Layout extends Application {
         stage.setTitle("IHM - Labo1");
         stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
+
+        /*
+        // Réduit ou agrandit toutes les fenêtres d'un coup
+        this.addWindowStateListener(e -> {
+            // Minimized
+            if ((e.getNewState() & Frame.ICONIFIED) == Frame.ICONIFIED && drawingBoard != null) {
+                drawingBoard.setAlwaysOnTop(false);
+                drawingBoard.setState(Frame.ICONIFIED);
+
+            }
+            // Maximized
+            else if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH && drawingBoard != null) {
+                drawingBoard.setAlwaysOnTop(true);
+                drawingBoard.setState(Frame.NORMAL);
+            }
+        });
+        */
     }
 
     /**
@@ -231,6 +248,7 @@ public class Layout extends Application {
                         drawingBoard.dispose();
                     }
                     drawingBoard = new DrawingBoard((int)image.getWidth(), (int)image.getHeight());
+                    drawingBoard.setAlwaysOnTop(false);
                 }
             }
         );

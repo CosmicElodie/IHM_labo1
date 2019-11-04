@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ public class DrawingBoard extends JFrame {
         this.setUndecorated(true);
         this.setBackground(new Color(1, 1, 1,0.1f)); // Pas beau, mais procure un fond transparent
         this.setLocation(235, 75); // Pas beau, nécessite la fenêtre de base en plein écran pour un superpositionnement parfait
-        this.setAlwaysOnTop(true); // Pas beau, reste devant même si la fenêtre de base se ferme
+        this.setAlwaysOnTop(true);
         this.setVisible(true);
     }
 
@@ -42,6 +40,12 @@ public class DrawingBoard extends JFrame {
                     shapes.add(r);
                     startDrag = null;
                     endDrag = null;
+                    repaint();
+                }
+
+                public void mouseExited(MouseEvent e) {
+                    verticalLine = null;
+                    horizontalLine = null;
                     repaint();
                 }
             });
