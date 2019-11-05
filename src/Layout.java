@@ -36,7 +36,7 @@ public class Layout extends Application {
 
     private Stage window;
     private File file;
-    private boolean fichierExporte; //sert à s'assurer que l'utilisateur a bien sauvegardé avant de quitter
+    private boolean fichierExporte; //sert à s'assurer que l'utilisateur ait bien sauvegardé avant de quitter
 
     private Image image;
 
@@ -57,7 +57,7 @@ public class Layout extends Application {
         //Racine de scene
         BorderPane border = new BorderPane();
 
-        //fond blanc de base
+        //fond de base
         border.getStyleClass().add("general-borderPanel");
 
         //------------------------------------------------------------------
@@ -65,10 +65,10 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         //Import and export buttons
-        importButton = new Button("Sélectionner une image");
+        importButton = new Button("Nouveau projet");
         importButton.getStyleClass().add("header-button");
 
-        exportButton = new Button("Exporter les labels");
+        exportButton = new Button("Exporter projet");
         exportButton.getStyleClass().add("header-button");
 
         quitButton = new Button();
@@ -112,7 +112,7 @@ public class Layout extends Application {
         // Pas beau : définit la taille de la fenêtre au maximum pour la superposition correcte de la fenêtre de dessin
         //double screenWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
         //double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 45;
-        Scene scene = new Scene(border, 1200, 700);
+        Scene scene = new Scene(border, 1200, 600);
 
         scene.getStylesheets().add("/design/stylesheet.css");
         window.setScene(scene);
@@ -147,15 +147,25 @@ public class Layout extends Application {
      * @return
      */
     private HBox navBar() {
+        //On créé une boxe horizontale qui définira l'espace "navigation".
         HBox hbox = new HBox(10);
+
+        //on règle l'écart du contenu intérieur avec les bords de la boxe
         hbox.setPadding(new Insets(15, 15, 15, 15));
+
+        //Espace entre les éléments
         hbox.setSpacing(10);   // Gap between nodes
+
+        //On lui applique d'autres styles présents dans la feuille CSS
         hbox.getStyleClass().add("header-hbox");
 
+        //On déclare le label qui va nous signifier si l'image a correctement été importée/exportée
         messageImporterExporter = new Label("");
 
+        //On ajoute tous ses éléments à la boxe
         hbox.getChildren().addAll(importButton, exportButton, messageImporterExporter);
 
+        //On définit un bouton "exporter"
         exportButton.setOnAction(
             event -> {
                 // Récupère le nom de l'image sans son extension
@@ -196,7 +206,7 @@ public class Layout extends Application {
             }
         );
 
-        // Ajouter un bouton "aide" dans le header
+        // Ajouter un bouton "quitter" dans le header
         quitButton(hbox);
         return hbox;
     }
@@ -205,6 +215,8 @@ public class Layout extends Application {
      * Footer
      */
     private HBox footerBar() {
+
+        //On définit une boxe horizontale qui définira l'espace "footer" -> copyright.
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(15, 15, 15, 15));
         hbox.getStyleClass().add("footer-header-hbox");
@@ -219,28 +231,45 @@ public class Layout extends Application {
     /**
      * Surface de dessin
      */
-    private class PaintSurface extends JComponent {
-        ArrayList<Shape> shapes = new ArrayList<>();
-        Point startDrag, endDrag;
-        Line2D horizontalLine, verticalLine;
+    private class PaintSurface extends JComponent
+    {
+        //Contient tous les différents rectangles qui ont pu être dessinés.
+        private ArrayList<Shape> shapes = new ArrayList<>();
 
-        private PaintSurface() {
-            this.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
+        //Points de départ et d'arrivée du rectangle
+        private Point startDrag, endDrag;
+
+        //Axes de symétrie
+        private Line2D horizontalLine, verticalLine;
+
+        private PaintSurface()
+        {
+            this.addMouseListener(new MouseAdapter()
+            {
+                public void mousePressed(MouseEvent e)
+                {
+                    //Si on clique et qu'on ne bouge pas, les coordonnées sont stockées dans le point de départ
                     startDrag = new Point(e.getX(), e.getY());
                     endDrag = startDrag;
                     repaint();
                 }
 
-                public void mouseReleased(MouseEvent e) {
+
+                public void mouseReleased(MouseEvent e)
+                {
+                    //On stocke les variables du rectangle qu'on a dessiné.
                     int x = e.getX();
                     int y = e.getY();
 
                     // En cas de relachement en dehors de l'image, le carré se dessine en bordure
-                    if(endDrag.x < 0) x = 0;
-                    if(endDrag.x > image.getWidth()) x = (int)image.getWidth();
-                    if(endDrag.y < 0) y = 0;
-                    if(endDrag.y > image.getHeight()) y = (int)image.getHeight();
+                    if(endDrag.x < 0)
+                        x = 0;
+                    if(endDrag.x > image.getWidth())
+                        x = (int)image.getWidth();
+                    if(endDrag.y < 0)
+                        y = 0;
+                    if(endDrag.y > image.getHeight())
+                        y = (int)image.getHeight();
 
                     Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
                     shapes.add(r);
@@ -251,7 +280,8 @@ public class Layout extends Application {
                     repaint();
                 }
 
-                public void mouseExited(MouseEvent e) {
+                public void mouseExited(MouseEvent e)
+                {
                     verticalLine = null;
                     horizontalLine = null;
                     repaint();
@@ -265,8 +295,9 @@ public class Layout extends Application {
                 }
 
                 public void mouseMoved(MouseEvent e) {
-                    verticalLine = makeVerticalLine(e.getX(), (int)image.getHeight());
-                    horizontalLine = makeHorizontalLine(e.getY(), (int)image.getWidth());
+
+                    verticalLine = makeVerticalLine(e.getX(), (int)(2 * image.getHeight()));
+                    horizontalLine = makeHorizontalLine(e.getY(), (int)(2 * image.getWidth()));
                     repaint();
                 }
             });
@@ -276,31 +307,33 @@ public class Layout extends Application {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             // Définit les couleurs utilisées
-            Color[] colors = { Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK};
+            Color[] colors = { Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK, Color.ORANGE, Color.GREEN};
             int colorIndex = 0;
 
             // Dessine l'image en arrière-plan
             BufferedImage bi = null;
             try {
                 bi = ImageIO.read(file);
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
             }
             g2.drawImage(bi, 0, 0, null);
 
             // Définit la taille et l'opacité des traits
             g2.setStroke(new BasicStroke(3));
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 
-            // Affiche les rectangles terminés
+            // Affiche les rectangles terminés selon les couleurs présentes dans le tableau "colors"
             for (Shape s : shapes) {
-                g2.setPaint(colors[(colorIndex++) % 6]);
+                g2.setPaint(colors[(colorIndex++) % colors.length]);
                 g2.draw(s);
             }
 
             // Affiche les lignes verticales et horizontales
             if (verticalLine != null && horizontalLine != null) {
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
                 g2.setPaint(Color.ORANGE);
                 g2.draw(verticalLine);
                 g2.draw(horizontalLine);
@@ -308,7 +341,7 @@ public class Layout extends Application {
 
             // Affiche le rectangle en cours de dessin
             if (startDrag != null && endDrag != null) {
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
                 g2.setPaint(Color.ORANGE);
                 Shape r = makeRectangle(startDrag.x, startDrag.y, endDrag.x, endDrag.y);
                 g2.draw(r);
@@ -533,7 +566,7 @@ public class Layout extends Application {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Quitter l'application");
                 alert.setHeaderText("");
-                alert.setContentText("Tous les labels n'ont pas été exportés. Souhaitez-vous vraiment quitter ?");
+                alert.setContentText("Votre travail n'a pas été exporté et va donc être perdu. Souhaitez-vous vraiment quitter ?");
                 
                 //enlève les boutons de base de la fenêtre.
                 alert.initStyle(StageStyle.UNDECORATED);
