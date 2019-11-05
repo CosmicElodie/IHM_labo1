@@ -110,9 +110,9 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         // Pas beau : définit la taille de la fenêtre au maximum pour la superposition correcte de la fenêtre de dessin
-        double screenWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 45;
-        Scene scene = new Scene(border, screenWidth, screenHeight);
+        //double screenWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        //double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 45;
+        Scene scene = new Scene(border, 1200, 700);
 
         scene.getStylesheets().add("/design/stylesheet.css");
         window.setScene(scene);
