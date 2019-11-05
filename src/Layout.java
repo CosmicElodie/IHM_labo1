@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.embed.swing.SwingNode;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,12 +17,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.text.View;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -32,8 +39,6 @@ public class Layout extends Application {
     private boolean fichierExporte; //sert à s'assurer que l'utilisateur a bien sauvegardé avant de quitter
 
     private Image image;
-    private ImageView imageView;
-    private DrawingBoard drawingBoard; // Solution provisoire : crée une nouvelle fenêtre par dessus l'actuelle
 
     private Button importButton;
     private Button exportButton;
@@ -42,9 +47,6 @@ public class Layout extends Application {
     private ListView panneauLabel;
     private Label checkLabel;
     private Label messageImporterExporter;
-
-    Point startDrag, endDrag;
-    Line horizontalLine, verticalLine;
 
     @Override
     public void start(Stage stage) {
@@ -215,6 +217,118 @@ public class Layout extends Application {
     }
 
     /**
+     * Surface de dessin
+     */
+    private class PaintSurface extends JComponent {
+        ArrayList<Shape> shapes = new ArrayList<>();
+        Point startDrag, endDrag;
+        Line2D horizontalLine, verticalLine;
+
+        private PaintSurface() {
+            this.addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    startDrag = new Point(e.getX(), e.getY());
+                    endDrag = startDrag;
+                    repaint();
+                }
+
+                public void mouseReleased(MouseEvent e) {
+                    int x = e.getX();
+                    int y = e.getY();
+
+                    // En cas de relachement en dehors de l'image, le carré se dessine en bordure
+                    if(endDrag.x < 0) x = 0;
+                    if(endDrag.x > image.getWidth()) x = (int)image.getWidth();
+                    if(endDrag.y < 0) y = 0;
+                    if(endDrag.y > image.getHeight()) y = (int)image.getHeight();
+
+                    Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
+                    shapes.add(r);
+                    // TODO : associer le rectangle à un label (via une liste par exemple)
+                    // pour pouvoir récupérer ses 4 coordonnées et mettre tout ça dans le fichier d'output
+                    startDrag = null;
+                    endDrag = null;
+                    repaint();
+                }
+
+                public void mouseExited(MouseEvent e) {
+                    verticalLine = null;
+                    horizontalLine = null;
+                    repaint();
+                }
+            });
+
+            this.addMouseMotionListener(new MouseMotionAdapter() {
+                public void mouseDragged(MouseEvent e) {
+                    endDrag = new Point(e.getX(), e.getY());
+                    repaint();
+                }
+
+                public void mouseMoved(MouseEvent e) {
+                    verticalLine = makeVerticalLine(e.getX(), (int)image.getHeight());
+                    horizontalLine = makeHorizontalLine(e.getY(), (int)image.getWidth());
+                    repaint();
+                }
+            });
+        }
+
+        public void paint(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            // Définit les couleurs utilisées
+            Color[] colors = { Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK};
+            int colorIndex = 0;
+
+            // Dessine l'image en arrière-plan
+            BufferedImage bi = null;
+            try {
+                bi = ImageIO.read(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            g2.drawImage(bi, 0, 0, null);
+
+            // Définit la taille et l'opacité des traits
+            g2.setStroke(new BasicStroke(3));
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+            // Affiche les rectangles terminés
+            for (Shape s : shapes) {
+                g2.setPaint(colors[(colorIndex++) % 6]);
+                g2.draw(s);
+            }
+
+            // Affiche les lignes verticales et horizontales
+            if (verticalLine != null && horizontalLine != null) {
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
+                g2.setPaint(Color.ORANGE);
+                g2.draw(verticalLine);
+                g2.draw(horizontalLine);
+            }
+
+            // Affiche le rectangle en cours de dessin
+            if (startDrag != null && endDrag != null) {
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.50f));
+                g2.setPaint(Color.ORANGE);
+                Shape r = makeRectangle(startDrag.x, startDrag.y, endDrag.x, endDrag.y);
+                g2.draw(r);
+            }
+        }
+
+        private Rectangle2D.Float makeRectangle(int x1, int y1, int x2, int y2) {
+            return new Rectangle2D.Float(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x1 - x2), Math.abs(y1 - y2));
+        }
+
+        private Line2D.Float makeVerticalLine(int x, int imageHeight) {
+            return new Line2D.Float(x, 0, x, imageHeight);
+        }
+
+        private Line2D.Float makeHorizontalLine(int y, int imageWidth) {
+            return new Line2D.Float(0, y, imageWidth, y);
+        }
+    }
+
+    /**
      * Corps logiciel
      * -> là où se charge l'image
      *
@@ -224,6 +338,9 @@ public class Layout extends Application {
         //On crée le corps du logiciel (là où sera l'image)
         StackPane sp = new StackPane();
         sp.getStyleClass().add("corps-gridPane");
+        SwingNode swingNode = new SwingNode();
+        sp.getChildren().add(swingNode);
+        sp.setAlignment(swingNode, Pos.TOP_LEFT);
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         importButton.setOnAction(
@@ -250,74 +367,22 @@ public class Layout extends Application {
                     checkLabel.setText("");
 
                     //Permet d'afficher l'image dans le corps de l'application
-                    sp.getChildren().remove(imageView);
-                    image = new Image(file.toURI().toString(), sp.getWidth(), sp.getHeight() - 30, true, false);
-                    imageView = new ImageView();
-                    imageView.setImage(image);
-                    sp.getChildren().add(imageView);
-                    sp.setAlignment(imageView, Pos.TOP_LEFT);
+                    image = new Image(file.toURI().toString(), sp.getWidth(), sp.getHeight(), true, false);
 
-                    verticalLine = new Line(0, 0, 0, 0);
-                    horizontalLine = new Line(0, 0, 0, 0);
-                    sp.getChildren().add(verticalLine);
-                    sp.getChildren().add(horizontalLine);
-                    sp.setAlignment(verticalLine, Pos.TOP_LEFT);
-                    sp.setAlignment(horizontalLine, Pos.TOP_LEFT);
+                    // Affiche la fenêtre de dessin
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            swingNode.setContent(new PaintSurface());
+                        }
+                    });
 
+                    /*
                     // Affiche la fenêtre de dessin, la détruit si elle existait avant
                     if(drawingBoard != null) {
                         drawingBoard.dispose();
                     }
                     drawingBoard = new DrawingBoard((int)image.getWidth(), (int)image.getHeight());
-                    
-                    /*
-                    // Test d'incorporation du code à l'imageView directement
-
-                    imageView.setOnMousePressed(e -> {
-                        startDrag = new Point((int)e.getX(), (int)e.getY());
-                        endDrag = startDrag;
-                    });
-
-                    imageView.setOnMouseReleased(e -> {
-                        // En cas de relachement en dehors de l'image, le carré se dessine en bordure
-                        if(endDrag.x < 0) endDrag.x = 0;
-                        if(endDrag.x > image.getWidth()) endDrag.x = (int)image.getWidth();
-                        if(endDrag.y < 0) endDrag.y = 0;
-                        if(endDrag.y > image.getHeight()) endDrag.y = (int)image.getHeight();
-
-                        Rectangle rectangle = new Rectangle(Math.min(startDrag.x, endDrag.x), Math.min(startDrag.y, endDrag.y),
-                                                            Math.abs(startDrag.x - endDrag.x), Math.abs(startDrag.y - endDrag.y));
-                        sp.setAlignment(rectangle, Pos.TOP_LEFT);
-                        rectangle.setTranslateX(Math.min(startDrag.x, endDrag.x));
-                        rectangle.setTranslateY(Math.min(startDrag.y, endDrag.y));
-                        sp.getChildren().add(rectangle);
-                    });
-
-                    imageView.setOnMouseDragged(e -> {
-                        endDrag = new Point((int)e.getX(), (int)e.getY());
-                    });
-
-                    imageView.setOnMouseMoved(e -> {
-                        sp.getChildren().remove(verticalLine);
-                        sp.getChildren().remove(horizontalLine);
-                        verticalLine = null;
-                        horizontalLine = null;
-                        verticalLine = new Line(0, 0, 0, image.getHeight());
-                        verticalLine.setStrokeWidth(5);
-                        horizontalLine = new Line(0, 0, image.getWidth(), 0);
-                        horizontalLine.setStrokeWidth(5);
-                        sp.getChildren().add(verticalLine);
-                        sp.getChildren().add(horizontalLine);
-                        sp.setAlignment(verticalLine, Pos.TOP_LEFT);
-                        sp.setAlignment(horizontalLine, Pos.TOP_LEFT);
-                        verticalLine.setTranslateX(e.getX());
-                        horizontalLine.setTranslateY(e.getY());
-                    });
-
-                    imageView.setOnMouseExited(e -> {
-                        sp.getChildren().remove(verticalLine);
-                        sp.getChildren().remove(horizontalLine);
-                    });
                      */
                 }
             }
