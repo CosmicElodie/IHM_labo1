@@ -137,7 +137,7 @@ public class Layout extends Application {
         hbox.setPadding(new Insets(15, 15, 15, 15));
 
         //Espace entre les éléments
-        hbox.setSpacing(10);
+        hbox.setSpacing(10);   // Gap between nodes
 
         //On lui applique d'autres styles présents dans la feuille CSS
         hbox.getStyleClass().add("header-hbox");
@@ -244,6 +244,7 @@ public class Layout extends Application {
                     int x = e.getX();
                     int y = e.getY();
 
+                    /*
                     // En cas de relachement en dehors de l'image, le carré se dessine en bordure
                     if(endDrag.x < 0)
                         x = 0;
@@ -253,7 +254,7 @@ public class Layout extends Application {
                         y = 0;
                     if(endDrag.y > image.getHeight())
                         y = (int)image.getHeight();
-
+                     */
                     Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
                     shapes.add(r);
                     // TODO : associer le rectangle à un label (via une liste par exemple)
@@ -289,19 +290,17 @@ public class Layout extends Application {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             // Définit les couleurs utilisées
-            Color[] colors = { Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK, Color.ORANGE, Color.GREEN};
+            Color[] colors = {Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK, Color.ORANGE, Color.GREEN};
             int colorIndex = 0;
 
             // Dessine l'image en arrière-plan
             BufferedImage bi = null;
             try {
-                bi = ImageIO.read(file);
+                 bi = ImageIO.read(file);
+            } catch (Exception e) {
+                System.out.println("Aucun fichier sélectionné");
             }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            g2.drawImage(bi, 0, 0, (int)image.getWidth(), (int)image.getHeight(), null);
+            g2.drawImage(bi, 0, 0, (int) image.getWidth(), (int) image.getHeight(), null);
 
             // Définit la taille et l'opacité des traits
             g2.setStroke(new BasicStroke(3));
@@ -374,9 +373,10 @@ public class Layout extends Application {
                 fileChooser.getExtensionFilters().add(extFilter);
 
                 //Ouvre la fenêtre du gestionnaire de fichiers.
-                file = fileChooser.showOpenDialog(null);
-
-                if (file != null) {
+                File tempFile = fileChooser.showOpenDialog(null);
+                if (tempFile != null)
+                {
+                    file = tempFile;
                     //On supprime les labels de la fenêtre ensuite
                     panneauLabel.getItems().clear();
                     checkLabel.setText("");
@@ -433,7 +433,7 @@ public class Layout extends Application {
         addLabelButton.getStyleClass().add("left-button");
 
         //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
-        //checkButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
+        addLabelButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
 
         //CASE OÙ SONT STOCKéS LES LABELS
         panneauLabel = new ListView();
@@ -446,22 +446,20 @@ public class Layout extends Application {
             if (ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
                 if (!panneauLabel.getItems().contains(ajouterLabel.getText())) {
                     panneauLabel.getItems().add(ajouterLabel.getText());
-                    checkLabel.setText("");
                     ajouterLabel.setText(""); //case vide à nouveau
+                    checkLabel.setText("");
                 } else {
                     checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
                 }
-
             } else {
                 checkLabel.setText("Chiffres et lettres uniquement !");
             }
         });
 
-
+        //DELETE LABEL BUTTON
         Label deleteLabel = new Label("");
         panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
 
-        //DELETE LABEL BUTTON
         Button deleteLabelButton = new Button();
         panneauVerticalGauche.getChildren().add(deleteLabelButton); //permet d'afficher l'élément dans le panneau
 
@@ -562,7 +560,6 @@ public class Layout extends Application {
                     stage.close();
                 }
             }
-
         });
 
         stack.getChildren().addAll(quitButton);
