@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public class Layout extends Application {
 
     private Stage window;
-    private File file;
+    private File file, tempFile;
     private boolean fichierExporte; //sert à s'assurer que l'utilisateur ait bien sauvegardé avant de quitter
 
     private Image image;
@@ -231,12 +231,10 @@ public class Layout extends Application {
             {
                 public void mousePressed(MouseEvent e)
                 {
-                    //Si on clique et qu'on ne bouge pas, les coordonnées sont stockées dans le point de départ
                     startDrag = new Point(e.getX(), e.getY());
                     endDrag = startDrag;
                     repaint();
                 }
-
 
                 public void mouseReleased(MouseEvent e)
                 {
@@ -244,7 +242,6 @@ public class Layout extends Application {
                     int x = e.getX();
                     int y = e.getY();
 
-                    /*
                     // En cas de relachement en dehors de l'image, le carré se dessine en bordure
                     if(endDrag.x < 0)
                         x = 0;
@@ -254,11 +251,15 @@ public class Layout extends Application {
                         y = 0;
                     if(endDrag.y > image.getHeight())
                         y = (int)image.getHeight();
-                     */
-                    Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
-                    shapes.add(r);
-                    // TODO : associer le rectangle à un label (via une liste par exemple)
-                    // pour pouvoir récupérer ses 4 coordonnées et mettre tout ça dans le fichier d'output
+
+                    // Le carré ne se dessine que s'il était dans l'image au début
+                    if(startDrag.x <= image.getWidth() && startDrag.y <= image.getHeight()) {
+                        Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
+                        shapes.add(r);
+                        // TODO : associer le rectangle à un label (via une liste par exemple)
+                        // pour pouvoir récupérer ses 4 coordonnées et mettre tout ça dans le fichier d'output
+                    }
+
                     startDrag = null;
                     endDrag = null;
                     repaint();
@@ -279,8 +280,14 @@ public class Layout extends Application {
                 }
 
                 public void mouseMoved(MouseEvent e) {
-                    verticalLine = makeVerticalLine(e.getX(), (int)image.getHeight());
-                    horizontalLine = makeHorizontalLine(e.getY(), (int)image.getWidth());
+                    verticalLine = null;
+                    horizontalLine = null;
+                    if(e.getX() <= image.getWidth()) {
+                        verticalLine = makeVerticalLine(e.getX(), (int) image.getHeight());
+                    }
+                    if(e.getY() <= image.getHeight()) {
+                        horizontalLine = makeHorizontalLine(e.getY(), (int) image.getWidth());
+                    }
                     repaint();
                 }
             });
@@ -304,7 +311,7 @@ public class Layout extends Application {
 
             // Définit la taille et l'opacité des traits
             g2.setStroke(new BasicStroke(3));
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
             // Affiche les rectangles terminés selon les couleurs présentes dans le tableau "colors"
             for (Shape s : shapes) {
@@ -373,10 +380,11 @@ public class Layout extends Application {
                 fileChooser.getExtensionFilters().add(extFilter);
 
                 //Ouvre la fenêtre du gestionnaire de fichiers.
-                File tempFile = fileChooser.showOpenDialog(null);
+                tempFile = fileChooser.showOpenDialog(null);
                 if (tempFile != null)
                 {
                     file = tempFile;
+                    tempFile = null;
                     //On supprime les labels de la fenêtre ensuite
                     panneauLabel.getItems().clear();
                     checkLabel.setText("");
