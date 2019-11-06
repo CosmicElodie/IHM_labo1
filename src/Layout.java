@@ -37,6 +37,7 @@ public class Layout extends Application {
     private Stage window;
     private File file, tempFile;
     private boolean fichierExporte; //sert à s'assurer que l'utilisateur ait bien sauvegardé avant de quitter
+    private boolean labelExporte; //pareil, mais pour s'assurer que les labels aient bien été exportés
 
     private Image image;
 
@@ -47,6 +48,11 @@ public class Layout extends Application {
     private ListView panneauLabel;
     private Label checkLabel;
     private Label messageImporterExporter;
+
+    //Corps du logiciel
+    StackPane sp;
+
+    private double RATIO_IMAGE = 1.4;
 
     @Override
     public void start(Stage stage) {
@@ -109,10 +115,7 @@ public class Layout extends Application {
         // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
         //------------------------------------------------------------------
 
-        // Pas beau : définit la taille de la fenêtre au maximum pour la superposition correcte de la fenêtre de dessin
-        //double screenWidth = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        //double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 45;
-        Scene scene = new Scene(border, 1200, 600);
+       Scene scene = new Scene(border, 1200, 600);
 
         scene.getStylesheets().add("/design/stylesheet.css");
         window.setScene(scene);
@@ -163,6 +166,7 @@ public class Layout extends Application {
                     // Sauvegarde l'output à la racine du projet
                     try (PrintWriter pw = new PrintWriter(new File(fileName + "Output.csv"))) {
                         fichierExporte = true;
+                        labelExporte = true;
                         StringBuilder sb = new StringBuilder();
                         sb.append("Image");
                         sb.append(',');
@@ -238,22 +242,34 @@ public class Layout extends Application {
 
                 public void mouseReleased(MouseEvent e)
                 {
+                    //On règle le ratio de l'image à maximum 2x sa largeur intiale
+                    // (au cas où on travaille sur un grand écran)
+                    //RATIO_IMAGE = 1.4;
+
                     //On stocke les variables du rectangle qu'on a dessiné.
                     int x = e.getX();
                     int y = e.getY();
 
-                    // En cas de relachement en dehors de l'image, le carré se dessine en bordure
+                    /*
+                    //On règle le ratio de l'image selon la taille du corps du logiciel.
+                    while((     (RATIO_IMAGE * image.getWidth()) > sp.getWidth())
+                            || ((RATIO_IMAGE * image.getHeight()) > sp.getHeight()))
+                    {
+                        RATIO_IMAGE -= 0.1;
+                    }*/
+
+                    // En cas de relachement en dehors de l'image, le rectangle se dessine en bordure
                     if(endDrag.x < 0)
                         x = 0;
-                    if(endDrag.x > image.getWidth())
-                        x = (int)image.getWidth();
+                    if(endDrag.x > (RATIO_IMAGE * image.getWidth()))
+                        x = (int)(RATIO_IMAGE * image.getWidth());
                     if(endDrag.y < 0)
                         y = 0;
-                    if(endDrag.y > image.getHeight())
-                        y = (int)image.getHeight();
+                    if(endDrag.y > (RATIO_IMAGE * image.getHeight()))
+                        y = (int)(RATIO_IMAGE * image.getHeight());
 
-                    // Le carré ne se dessine que s'il était dans l'image au début
-                    if(startDrag.x <= image.getWidth() && startDrag.y <= image.getHeight()) {
+                    // Le rectangle ne se dessine que s'il était dans l'image au début
+                    if(startDrag.x <= (RATIO_IMAGE * image.getWidth()) && startDrag.y <= (RATIO_IMAGE * image.getHeight())) {
                         Shape r = makeRectangle(startDrag.x, startDrag.y, x, y);
                         shapes.add(r);
                         // TODO : associer le rectangle à un label (via une liste par exemple)
@@ -282,11 +298,11 @@ public class Layout extends Application {
                 public void mouseMoved(MouseEvent e) {
                     verticalLine = null;
                     horizontalLine = null;
-                    if(e.getX() <= image.getWidth()) {
-                        verticalLine = makeVerticalLine(e.getX(), (int) image.getHeight());
+                    if(e.getX() <= (RATIO_IMAGE * image.getWidth())) {
+                        verticalLine = makeVerticalLine(e.getX(), (int)(RATIO_IMAGE * image.getHeight()));
                     }
-                    if(e.getY() <= image.getHeight()) {
-                        horizontalLine = makeHorizontalLine(e.getY(), (int) image.getWidth());
+                    if(e.getY() <= (RATIO_IMAGE * image.getHeight())) {
+                        horizontalLine = makeHorizontalLine(e.getY(), (int)(RATIO_IMAGE * image.getWidth()));
                     }
                     repaint();
                 }
@@ -307,9 +323,10 @@ public class Layout extends Application {
             } catch (Exception e) {
                 System.out.println("Aucun fichier sélectionné");
             }
-            g2.drawImage(bi, 0, 0, (int) image.getWidth(), (int) image.getHeight(), null);
 
-            // Définit la taille et l'opacité des traits
+            g2.drawImage(bi, 0, 0, (int) (RATIO_IMAGE * image.getWidth()), (int) (RATIO_IMAGE * image.getHeight()), null);
+
+            //Définit la taille et l'opacité des traits
             g2.setStroke(new BasicStroke(3));
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
@@ -357,7 +374,7 @@ public class Layout extends Application {
      */
     private StackPane corpsLogiciel() {
         //On crée le corps du logiciel (là où sera l'image)
-        StackPane sp = new StackPane();
+        sp = new StackPane();
         sp.getStyleClass().add("corps-gridPane");
         SwingNode swingNode = new SwingNode();
         sp.getChildren().add(swingNode);
@@ -390,7 +407,7 @@ public class Layout extends Application {
                     checkLabel.setText("");
 
                     //Permet d'afficher l'image dans le corps de l'application
-                    image = new Image(file.toURI().toString(), sp.getWidth(), sp.getHeight(), true, false);
+                    image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
 
                     // Affiche la fenêtre de dessin
                     SwingUtilities.invokeLater(new Runnable() {
@@ -452,11 +469,14 @@ public class Layout extends Application {
         addLabelButton.setOnAction(e ->
         {
             if (ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
-                if (!panneauLabel.getItems().contains(ajouterLabel.getText())) {
+                if (!panneauLabel.getItems().contains(ajouterLabel.getText()))
+                {
                     panneauLabel.getItems().add(ajouterLabel.getText());
+                    labelExporte = false;
                     ajouterLabel.setText(""); //case vide à nouveau
                     checkLabel.setText("");
-                } else {
+                } else
+                    {
                     checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
                 }
             } else {
@@ -538,7 +558,7 @@ public class Layout extends Application {
         quitButton.setAlignment(Pos.CENTER_RIGHT);
 
         quitButton.setOnAction(event -> {
-            if(fichierExporte)
+            if(fichierExporte && labelExporte)
             {
                 Stage stage = (Stage) quitButton.getScene().getWindow();
                 stage.close();
@@ -577,32 +597,5 @@ public class Layout extends Application {
 
         hb.getChildren().add(stack);
         HBox.setHgrow(stack, Priority.ALWAYS);
-
-    }
-
-    /*
-     * BOUTONS SAUVEGARDER ET ANNULER (pas encore utilisés)
-     *
-     * @param grid Grid to anchor to the top of the anchor pane
-     */
-    private AnchorPane saveAndCancel(GridPane grid) {
-
-        AnchorPane anchorpane = new AnchorPane();
-
-        Button buttonSave = new Button("Save");
-        Button buttonCancel = new Button("Cancel");
-
-        HBox hb = new HBox();
-        hb.setPadding(new Insets(0, 10, 10, 10));
-        hb.setSpacing(10);
-        hb.getChildren().addAll(buttonSave, buttonCancel);
-
-        anchorpane.getChildren().addAll(grid, hb);
-        // Anchor buttons to bottom right, anchor grid to top
-        AnchorPane.setBottomAnchor(hb, 8.0);
-        AnchorPane.setRightAnchor(hb, 5.0);
-        AnchorPane.setTopAnchor(grid, 10.0);
-
-        return anchorpane;
     }
 }
