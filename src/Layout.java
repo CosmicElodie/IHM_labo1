@@ -120,23 +120,6 @@ public class Layout extends Application {
         window.setTitle("IHM - Labo1");
         window.initStyle(StageStyle.UNDECORATED);
         window.show();
-
-        /*
-        // Réduit ou agrandit toutes les fenêtres d'un coup
-        this.addWindowStateListener(e -> {
-            // Minimized
-            if ((e.getNewState() & Frame.ICONIFIED) == Frame.ICONIFIED && drawingBoard != null) {
-                drawingBoard.setAlwaysOnTop(false);
-                drawingBoard.setState(Frame.ICONIFIED);
-
-            }
-            // Maximized
-            else if ((e.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH && drawingBoard != null) {
-                drawingBoard.setAlwaysOnTop(true);
-                drawingBoard.setState(Frame.NORMAL);
-            }
-        });
-        */
     }
 
     /**
@@ -154,7 +137,7 @@ public class Layout extends Application {
         hbox.setPadding(new Insets(15, 15, 15, 15));
 
         //Espace entre les éléments
-        hbox.setSpacing(10);   // Gap between nodes
+        hbox.setSpacing(10);
 
         //On lui applique d'autres styles présents dans la feuille CSS
         hbox.getStyleClass().add("header-hbox");
@@ -295,9 +278,8 @@ public class Layout extends Application {
                 }
 
                 public void mouseMoved(MouseEvent e) {
-
-                    verticalLine = makeVerticalLine(e.getX(), (int)(2 * image.getHeight()));
-                    horizontalLine = makeHorizontalLine(e.getY(), (int)(2 * image.getWidth()));
+                    verticalLine = makeVerticalLine(e.getX(), (int)image.getHeight());
+                    horizontalLine = makeHorizontalLine(e.getY(), (int)image.getWidth());
                     repaint();
                 }
             });
@@ -319,7 +301,7 @@ public class Layout extends Application {
             {
                 e.printStackTrace();
             }
-            g2.drawImage(bi, 0, 0, null);
+            g2.drawImage(bi, 0, 0, (int)image.getWidth(), (int)image.getHeight(), null);
 
             // Définit la taille et l'opacité des traits
             g2.setStroke(new BasicStroke(3));
@@ -409,14 +391,6 @@ public class Layout extends Application {
                             swingNode.setContent(new PaintSurface());
                         }
                     });
-
-                    /*
-                    // Affiche la fenêtre de dessin, la détruit si elle existait avant
-                    if(drawingBoard != null) {
-                        drawingBoard.dispose();
-                    }
-                    drawingBoard = new DrawingBoard((int)image.getWidth(), (int)image.getHeight());
-                     */
                 }
             }
         );
@@ -472,15 +446,20 @@ public class Layout extends Application {
             if (ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
                 if (!panneauLabel.getItems().contains(ajouterLabel.getText())) {
                     panneauLabel.getItems().add(ajouterLabel.getText());
-                    checkLabel.setText("\"" + ajouterLabel.getText() + "\" ajouté avec succès !");
+                    checkLabel.setText("");
+                    ajouterLabel.setText(""); //case vide à nouveau
                 } else {
                     checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
                 }
-                ajouterLabel.setText(""); //case vide à nouveau
+
             } else {
                 checkLabel.setText("Chiffres et lettres uniquement !");
             }
         });
+
+
+        Label deleteLabel = new Label("");
+        panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
 
         //DELETE LABEL BUTTON
         Button deleteLabelButton = new Button();
@@ -494,19 +473,16 @@ public class Layout extends Application {
         deleteLabelButton.getStyleClass().add("left-button");
         panneauLabel.getSelectionModel().select(0);
 
-        Label deleteLabel = new Label("");
-
         deleteLabelButton.setOnAction(e ->
         {
             try {
                 panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+                deleteLabel.setText("");
             } catch (Exception ex) {
                 deleteLabel.setText("Aucun label sélectionné.");
             }
         });
 
-        panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
-        
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(titreLabel, new Insets(10, 10, 10, 10));
@@ -567,7 +543,7 @@ public class Layout extends Application {
                 alert.setTitle("Quitter l'application");
                 alert.setHeaderText("");
                 alert.setContentText("Votre travail n'a pas été exporté et va donc être perdu. Souhaitez-vous vraiment quitter ?");
-                
+
                 //enlève les boutons de base de la fenêtre.
                 alert.initStyle(StageStyle.UNDECORATED);
                 ButtonType oui = new ButtonType("Quitter");
