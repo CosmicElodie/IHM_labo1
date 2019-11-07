@@ -1,6 +1,5 @@
 import javafx.application.Application;
 import javafx.embed.swing.SwingNode;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,26 +10,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.text.View;
+import javax.xml.soap.Text;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Layout extends Application {
 
@@ -38,6 +28,8 @@ public class Layout extends Application {
     private File file, tempFile;
     private boolean fichierExporte; //sert à s'assurer que l'utilisateur ait bien sauvegardé avant de quitter
     private boolean labelExporte; //pareil, mais pour s'assurer que les labels aient bien été exportés
+
+    private Text test;
 
     private Image image;
 
@@ -49,16 +41,21 @@ public class Layout extends Application {
     private Label checkLabel;
     private Label messageImporterExporter;
 
-    private Shape r; //le rectangle en cours
+    //le rectangle en cours
+    private Shape r;
 
     //Corps du logiciel
     StackPane sp;
+
+    //la structure qui liera un rectangle avec un label
+    Map<Shape, String> lienRectangleLabel;
 
     private double RATIO_IMAGE = 1.4;
 
     @Override
     public void start(Stage stage) {
         window = stage;
+        lienRectangleLabel = new HashMap<Shape, String>();
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
@@ -129,9 +126,6 @@ public class Layout extends Application {
 
     /**
      * NAVIGATION
-     * -> upload button
-     * -> help button
-     *
      * @return
      */
     private HBox navBar() {
@@ -264,7 +258,9 @@ public class Layout extends Application {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            swingNode.setContent(new PaintSurface(image,file));
+                            PaintSurface ps = new PaintSurface(image,file, (HashMap) lienRectangleLabel, panneauLabel);
+                            swingNode.setContent(ps);
+
                         }
                     });
                 }

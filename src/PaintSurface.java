@@ -1,6 +1,11 @@
-
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
-
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -13,13 +18,27 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PaintSurface extends JComponent
 {
+    //Le rectangle en cours d'utilisation
     private Shape r;
-    private double RATIO_IMAGE = 1.4;
+    static int compteurRectangle = 1;
+    //Coordonnées du rectangle en cours d'utilisation
+    private int x1;
+    private int y1;
+    private int x2;
+    private int y2;
+
+    //Image en cours d'utilisation
     private Image image;
+
+    //Fichier en cours d'utilisation
     private File file;
+
+    final double RATIO_IMAGE = 1.4;
+
 
     //Contient tous les différents rectangles qui ont pu être dessinés.
     private ArrayList<Shape> shapes = new ArrayList<>();
@@ -30,7 +49,7 @@ public class PaintSurface extends JComponent
     //Axes de symétrie
     private Line2D horizontalLine, verticalLine;
 
-    PaintSurface(Image image, File file)
+    PaintSurface(Image image, File file, HashMap lienRectangleLabel, ListView panneauLabel)
     {
         this.image = image;
         this.file = file;
@@ -61,10 +80,27 @@ public class PaintSurface extends JComponent
 
                 // Le rectangle ne se dessine que s'il était dans l'image au début
                 if(startDrag.x <= (RATIO_IMAGE * image.getWidth()) && startDrag.y <= (RATIO_IMAGE * image.getHeight())) {
-                    r = makeRectangle(startDrag.x, startDrag.y, x, y);
+                    x1 = startDrag.x;
+                    y1 = startDrag.y;
+                    x2 = x;
+                    y2 = y;
+                    r = makeRectangle(x1,y1,x2,y2);
                     shapes.add(r);
                     // TODO : associer le rectangle à un label (via une liste par exemple)
-                    // pour pouvoir récupérer ses 4 coordonnées et mettre tout ça dans le fichier d'output
+                    // Créer un label "rectangle n°X" à chaque fois qu'on créé un rectangle.
+                    //L'utilisateur pour le modifier quand il le souhaite par la suite. 
+                    lienRectangleLabel.put(r,("Rectangle n° " + compteurRectangle++));
+                    Label l = new Label((String) lienRectangleLabel.get(r));
+
+                    //Permet de gérer les erreurs liées à la modification de panneauLabel.
+                    Platform.runLater(new Runnable(){
+                        @Override
+                        public void run() {
+                            panneauLabel.getItems().add(l);
+                        }
+                    });
+
+
                 }
 
                 startDrag = null;
@@ -155,5 +191,25 @@ public class PaintSurface extends JComponent
 
     private Line2D.Float makeHorizontalLine(int y, int imageWidth) {
         return new Line2D.Float(0, y, imageWidth, y);
+    }
+
+    public int getX1() {
+        return x1;
+    }
+
+    public int getY1() {
+        return y1;
+    }
+
+    public int getX2() {
+        return x2;
+    }
+
+    public int getY2() {
+        return y2;
+    }
+
+    public Shape getR() {
+        return r;
     }
 }
