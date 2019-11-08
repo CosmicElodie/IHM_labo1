@@ -10,12 +10,11 @@ import javafx.scene.text.Text;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.Console;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,8 +36,7 @@ public class PaintSurface extends JComponent
     //Fichier en cours d'utilisation
     private File file;
 
-    final double RATIO_IMAGE = 1.4;
-
+    final double RATIO_IMAGE = 1;
 
     //Contient tous les différents rectangles qui ont pu être dessinés.
     private ArrayList<Shape> shapes = new ArrayList<>();
@@ -49,9 +47,9 @@ public class PaintSurface extends JComponent
     //Axes de symétrie
     private Line2D horizontalLine, verticalLine;
 
-    PaintSurface(Image image, File file, HashMap lienRectangleLabel, ListView panneauLabel)
+    PaintSurface(Image img, File file, HashMap lienRectangleLabel, ListView panneauLabel, StackPane sp)
     {
-        this.image = image;
+        this.image = img;
         this.file = file;
         this.addMouseListener(new MouseAdapter()
         {
@@ -59,7 +57,10 @@ public class PaintSurface extends JComponent
             {
                 startDrag = new Point(e.getX(), e.getY());
                 endDrag = startDrag;
-                repaint();
+                // Le rectangle ne se dessine que s'il était dans l'image au début
+                if(startDrag.x <= (RATIO_IMAGE * image.getWidth()) && startDrag.y <= (RATIO_IMAGE * image.getHeight())) {
+                    repaint();
+                }
             }
 
             public void mouseReleased(MouseEvent e)
@@ -99,8 +100,6 @@ public class PaintSurface extends JComponent
                             panneauLabel.getItems().add(l);
                         }
                     });
-
-
                 }
 
                 startDrag = null;
@@ -134,6 +133,19 @@ public class PaintSurface extends JComponent
                 repaint();
             }
         });
+
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e)
+            {
+                if(shapes.isEmpty()) {
+                    image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
+                    repaint();
+                } else {
+                    // TODO : Message d'alerte indiquant qu'il est impossible de resize dès qu'un rectangle est dessiné
+                    // (car en fait faudrait redessiner chaque rectangle et c'est trop chiant)
+                }
+            }
+        });
     }
 
     public void paint(Graphics g) {
@@ -150,7 +162,6 @@ public class PaintSurface extends JComponent
         } catch (Exception e) {
             System.out.println("Aucun fichier sélectionné");
         }
-
         g2.drawImage(bi, 0, 0, (int) (RATIO_IMAGE * image.getWidth()), (int) (RATIO_IMAGE * image.getHeight()), null);
 
         //Définit la taille et l'opacité des traits
@@ -176,7 +187,6 @@ public class PaintSurface extends JComponent
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
             g2.setPaint(Color.ORANGE);
             r = makeRectangle(startDrag.x, startDrag.y, endDrag.x, endDrag.y);
-
             g2.draw(r);
         }
     }

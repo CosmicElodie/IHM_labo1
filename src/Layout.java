@@ -114,13 +114,12 @@ public class Layout extends Application {
         // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
         //------------------------------------------------------------------
 
-       Scene scene = new Scene(border, 1200, 600);
+        Scene scene = new Scene(border, 1200, 600);
 
         scene.getStylesheets().add("/design/stylesheet.css");
         window.setScene(scene);
-
         window.setTitle("IHM - Labo1");
-        window.initStyle(StageStyle.UNDECORATED);
+        //window.initStyle(StageStyle.UNDECORATED);
         window.show();
     }
 
@@ -149,44 +148,44 @@ public class Layout extends Application {
 
         //On définit un bouton "exporter"
         exportButton.setOnAction(
-            event -> {
-                // Récupère le nom de l'image sans son extension
-                if (file != null) {
-                    String format = "";
-                    int i = file.getName().lastIndexOf('.');
-                    if (i > 0) {
-                        format = file.getName().substring(i);
-                    }
-                    String fileName = file.getName().replace(format, "");
+                event -> {
+                    // Récupère le nom de l'image sans son extension
+                    if (file != null) {
+                        String format = "";
+                        int i = file.getName().lastIndexOf('.');
+                        if (i > 0) {
+                            format = file.getName().substring(i);
+                        }
+                        String fileName = file.getName().replace(format, "");
 
-                    // Sauvegarde l'output à la racine du projet
-                    try (PrintWriter pw = new PrintWriter(new File(fileName + "Output.csv"))) {
-                        fichierExporte = true;
-                        labelExporte = true;
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Image");
-                        sb.append(',');
-                        sb.append("Objects");
-                        sb.append(',');
-                        sb.append("Coordinates");
-                        sb.append('\n');
+                        // Sauvegarde l'output à la racine du projet
+                        try (PrintWriter pw = new PrintWriter(new File(fileName + "Output.csv"))) {
+                            fichierExporte = true;
+                            labelExporte = true;
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("Image");
+                            sb.append(',');
+                            sb.append("Objects");
+                            sb.append(',');
+                            sb.append("Coordinates");
+                            sb.append('\n');
 
-                        sb.append(file.getPath());
-                        sb.append(',');
-                        sb.append(panneauLabel.getItems());
-                        sb.append(',');
-                        sb.append("Coordonnées à implémenter");
-                        sb.append('\n');
+                            sb.append(file.getPath());
+                            sb.append(',');
+                            sb.append(panneauLabel.getItems());
+                            sb.append(',');
+                            sb.append("Coordonnées à implémenter");
+                            sb.append('\n');
 
-                        pw.write(sb.toString());
+                            pw.write(sb.toString());
 
-                        messageImporterExporter.setText("L'output a été correctement généré.");
-                    } catch (Exception e) {
-                        fichierExporte = false;
-                        messageImporterExporter.setText("L'output n'a pas correctement été généré");
+                            messageImporterExporter.setText("L'output a été correctement généré.");
+                        } catch (Exception e) {
+                            fichierExporte = false;
+                            messageImporterExporter.setText("L'output n'a pas correctement été généré");
+                        }
                     }
                 }
-            }
         );
 
         // Ajouter un bouton "quitter" dans le header
@@ -227,44 +226,44 @@ public class Layout extends Application {
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         importButton.setOnAction(
-            event -> {
-                FileChooser fileChooser = new FileChooser();
-                fichierExporte = false;
-                messageImporterExporter.setText("");
+                event -> {
+                    FileChooser fileChooser = new FileChooser();
+                    fichierExporte = false;
+                    messageImporterExporter.setText("");
 
-                if (file != null) {
-                    File existDirectory = file.getParentFile();
-                    fileChooser.setInitialDirectory(existDirectory);
+                    if (file != null) {
+                        File existDirectory = file.getParentFile();
+                        fileChooser.setInitialDirectory(existDirectory);
+                    }
+
+                    //permet d'afficher les extensions qu'on accepte de sélectionner.
+                    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
+                    fileChooser.getExtensionFilters().add(extFilter);
+
+                    //Ouvre la fenêtre du gestionnaire de fichiers.
+                    tempFile = fileChooser.showOpenDialog(null);
+                    if (tempFile != null)
+                    {
+                        file = tempFile;
+                        tempFile = null;
+                        //On supprime les labels de la fenêtre ensuite
+                        panneauLabel.getItems().clear();
+                        checkLabel.setText("");
+
+                        //Permet d'afficher l'image dans le corps de l'application
+                        image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
+
+                        // Affiche la fenêtre de dessin
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                PaintSurface ps = new PaintSurface(image, file, (HashMap) lienRectangleLabel, panneauLabel, sp);
+                                ps.compteurRectangle = 1;
+                                swingNode.setContent(ps);
+                            }
+                        });
+                    }
                 }
-
-                //permet d'afficher les extensions qu'on accepte de sélectionner.
-                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp");
-                fileChooser.getExtensionFilters().add(extFilter);
-
-                //Ouvre la fenêtre du gestionnaire de fichiers.
-                tempFile = fileChooser.showOpenDialog(null);
-                if (tempFile != null)
-                {
-                    file = tempFile;
-                    tempFile = null;
-                    //On supprime les labels de la fenêtre ensuite
-                    panneauLabel.getItems().clear();
-                    checkLabel.setText("");
-
-                    //Permet d'afficher l'image dans le corps de l'application
-                    image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
-
-                    // Affiche la fenêtre de dessin
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            PaintSurface ps = new PaintSurface(image,file, (HashMap) lienRectangleLabel, panneauLabel);
-                            swingNode.setContent(ps);
-
-                        }
-                    });
-                }
-            }
         );
 
         return sp;
@@ -323,7 +322,7 @@ public class Layout extends Application {
                     ajouterLabel.setText(""); //case vide à nouveau
                     checkLabel.setText("");
                 } else
-                    {
+                {
                     checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
                 }
             } else {
