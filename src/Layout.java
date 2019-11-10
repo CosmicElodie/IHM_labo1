@@ -3,10 +3,10 @@ import javafx.embed.swing.SwingNode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -125,6 +125,7 @@ public class Layout extends Application {
 
     /**
      * NAVIGATION
+     *
      * @return
      */
     private HBox navBar() {
@@ -157,9 +158,10 @@ public class Layout extends Application {
                     messageImporterExporter.setText("");
                     boolean isCorrectName = false;
                     boolean isEmpty = false;
-                    //seulement les chiffres et les lettres sans accent sont acceptées.
-                    if (nomOutputFile.getText().matches("[A-Za-z0-9_]+"))
-                    {
+                    boolean isSameName = false;
+
+                    //seulement les chiffres + _ + lettres sans accent sont acceptées.
+                    if (nomOutputFile.getText().matches("[A-Za-z0-9_]+")) {
                         isEmpty = false;
                         isCorrectName = true;
 
@@ -174,14 +176,27 @@ public class Layout extends Application {
                             nomOutputFile.setText("");
                             messageImporterExporter.setText("");
                         }
-                    }
-                    else if (nomOutputFile.getText().matches(""))
-                    {
+                    } else if (nomOutputFile.getText().matches("")) {
                         isEmpty = true;
                     }
 
+
                     // Sauvegarde l'output à la racine du projet
-                    try (PrintWriter pw = new PrintWriter(new File(fileName))) {
+                    try {
+
+                        isSameName = false;
+                        //Test si un fichier porte le même nom.
+                        File directory = new File("src/output");
+                        File[] fList = directory.listFiles();
+                        for (File file : fList) {
+                            if (file.getName().equals(fileName)) {
+                                isSameName = true;
+                                throw new Exception();
+                            }
+                        }
+
+                        PrintWriter pw = new PrintWriter(new File("src\\output\\" + fileName));
+
                         fichierExporte = true;
                         labelExporte = true;
                         StringBuilder sb = new StringBuilder();
@@ -202,7 +217,9 @@ public class Layout extends Application {
                         pw.write(sb.toString());
                         messageImporterExporter.setText(fileName + " a été correctement généré.");
                     } catch (Exception e) {
-                        if(!isCorrectName && !isEmpty)
+                        if (isSameName) {
+                            messageImporterExporter.setText("Ce nom existe déjà, veuiillez en choisir un autre.");
+                        } else if (!isCorrectName && !isEmpty)
                             messageImporterExporter.setText("Chiffre et lettre uniquement !");
                         else
                             messageImporterExporter.setText("L'output n'a pas correctement été généré");
@@ -264,8 +281,7 @@ public class Layout extends Application {
 
                     //Ouvre la fenêtre du gestionnaire de fichiers.
                     tempFile = fileChooser.showOpenDialog(null);
-                    if (tempFile != null)
-                    {
+                    if (tempFile != null) {
                         file = tempFile;
                         tempFile = null;
                         //On supprime les labels de la fenêtre ensuite
@@ -337,14 +353,12 @@ public class Layout extends Application {
         addLabelButton.setOnAction(e ->
         {
             if (ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
-                if (!panneauLabel.getItems().contains(ajouterLabel.getText()))
-                {
+                if (!panneauLabel.getItems().contains(ajouterLabel.getText())) {
                     panneauLabel.getItems().add(ajouterLabel.getText());
                     labelExporte = false;
                     ajouterLabel.setText(""); //case vide à nouveau
                     checkLabel.setText("");
-                } else
-                {
+                } else {
                     checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
                 }
             } else {
@@ -426,13 +440,10 @@ public class Layout extends Application {
         quitButton.setAlignment(Pos.CENTER_RIGHT);
 
         quitButton.setOnAction(event -> {
-            if(fichierExporte && labelExporte)
-            {
+            if (fichierExporte && labelExporte) {
                 Stage stage = (Stage) quitButton.getScene().getWindow();
                 stage.close();
-            }
-            else
-            {
+            } else {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Quitter l'application");
                 alert.setHeaderText("");
