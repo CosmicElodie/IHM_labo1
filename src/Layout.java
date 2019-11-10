@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
 
 public class Layout extends Application {
 
@@ -133,10 +135,11 @@ public class Layout extends Application {
 
         //CASE NOMMER FICHIER
         TextField nomOutputFile = new TextField();
+        nomOutputFile.getStyleClass().add("header-interieur-case");
 
         //On ajoute tous ses éléments à la boxe
         hbox.getChildren().addAll(importButton, exportButton, nomOutputFile, messageImporterExporter);
-
+        nomOutputFile.setText("NomDeVotreProjet");
         //On définit un bouton "exporter"
         exportButton.setOnAction(
                 event ->
@@ -300,6 +303,9 @@ public class Layout extends Application {
         VBox panneauVerticalGauche = new VBox();
         panneauVerticalGauche.getStyleClass().add("menuLabelsGauche-vbox");
 
+        Label titrePanneauLabeal = new Label("Labels");
+        titrePanneauLabeal.getStyleClass().add("titre-label");
+        panneauVerticalGauche.getChildren().add(titrePanneauLabeal);
         //CASE OÙ SONT STOCKéS LES LABELS
         panneauLabel = new ListView();
         panneauLabel.setCellFactory(TextFieldListCell.forListView());
@@ -311,13 +317,11 @@ public class Layout extends Application {
         //permet de sélectionner plusieurs labels
         panneauLabel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-
         //DELETE LABEL BUTTON
         Label deleteLabel = new Label("");
-        panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
-
         Button deleteLabelButton = new Button();
         panneauVerticalGauche.getChildren().add(deleteLabelButton); //permet d'afficher l'élément dans le panneau
+        panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
 
         Image deleteIcon = new Image(getClass().getResourceAsStream("/images/delete.png"));
         ImageView deleteIconView = new ImageView(deleteIcon);
@@ -330,12 +334,26 @@ public class Layout extends Application {
         deleteLabelButton.setOnAction(e ->
         {
             try {
-                //on supprime le rectangle de l'array (il faut bouger la souris pour qu'il disparaisse)
-                PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
 
-                //On supprime le label de la listeView
-                panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
-                deleteLabel.setText("");
+                //Permet de supprimer plusieurs éléments en même temps
+                if(panneauLabel.getSelectionModel().getSelectedItems().size() > 1)
+                {
+                    while (panneauLabel.getSelectionModel().getSelectedItems().size() > 0)
+                    {
+                        //on supprime le rectangle de l'array (il faut bouger la souris pour qu'il disparaisse)
+                        PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+                        panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
+                    }
+                    deleteLabel.setText("Les éléments ont correctement\n été supprimés.");
+                }
+                //condition pour un unique élément sélectionné
+                else
+                {
+                    PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+                    panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
+                    deleteLabel.setText(panneauLabel.getSelectionModel().getSelectedItem() + " a correctement été supprimé.");
+                }
+
             } catch (Exception ex) {
                 deleteLabel.setText("Aucun label sélectionné.");
             }

@@ -30,6 +30,11 @@
     -fx-background-color: #E4D5F7;
 }
 
+.header-interieur-case
+{
+    -fx-text-fill: #7b7b8d;
+}
+
 /* ************************************************ */
                     /* BODY */
 /* ************************************************ */
@@ -52,6 +57,13 @@
     -fx-padding: 15 15 15 15;
 }
 
+.titre-label
+{
+    -fx-font:15 Impact;
+    -fx-text-fill: #636366;
+    -fx-padding: 0 0 0 15;
+}
+
 .panneauLabel
 {
     -fx-pref-width: 150;
@@ -65,7 +77,7 @@
 
 .left-button:hover
 {
-    -fx-background-color: E4DAE2;
+    -fx-background-color: #E4DAE2;
 }
 
 

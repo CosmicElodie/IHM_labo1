@@ -96,8 +96,8 @@ public class PaintSurface extends JComponent
                     //tout en ajoutant le label à la listView
                     Platform.runLater(() ->
                             {
-                                panneauLabel.getItems().add(compteurRectangle-1, compteurRectangle + " - double-click to rename");
-                                panneauLabel.edit(compteurRectangle );
+                                panneauLabel.getItems().add(compteurRectangle - 1, compteurRectangle + " - double-click to rename");
+                                //panneauLabel.edit(compteurRectangle+1);
                                 ++compteurRectangle;
                             });
                 }
