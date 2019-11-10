@@ -50,7 +50,6 @@ public class Layout extends Application {
     //la structure qui liera un rectangle avec un label
     Map<Shape, String> lienRectangleLabel;
 
-    private double RATIO_IMAGE = 1.4;
 
     @Override
     public void start(Stage stage) {
