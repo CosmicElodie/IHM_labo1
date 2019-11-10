@@ -18,12 +18,14 @@ import java.io.Console;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class PaintSurface extends JComponent
 {
     //Le rectangle en cours d'utilisation
     private Shape r;
     static int compteurRectangle = 1;
+
     //Coordonnées du rectangle en cours d'utilisation
     private int x1;
     private int y1;
@@ -86,20 +88,19 @@ public class PaintSurface extends JComponent
                     x2 = x;
                     y2 = y;
                     r = makeRectangle(x1,y1,x2,y2);
+
+                    //On affiche le rectangle
                     shapes.add(r);
-                    // TODO : associer le rectangle à un label (via une liste par exemple)
-                    // Créer un label "rectangle n°X" à chaque fois qu'on créé un rectangle.
-                    //L'utilisateur pour le modifier quand il le souhaite par la suite. 
+
+                    //On créé un lien entre le rectangle et son label
                     lienRectangleLabel.put(r,("Rectangle n° " + compteurRectangle++));
+
+                    //On met le label dans la listView
                     Label l = new Label((String) lienRectangleLabel.get(r));
 
-                    //Permet de gérer les erreurs liées à la modification de panneauLabel.
-                    Platform.runLater(new Runnable(){
-                        @Override
-                        public void run() {
-                            panneauLabel.getItems().add(l);
-                        }
-                    });
+                    //Fonction lambda qui permet de gérer les erreurs liées à la modification de panneauLabel
+                    //tout en ajoutant le label à la listView
+                    Platform.runLater(() -> panneauLabel.getItems().add(l));
                 }
 
                 startDrag = null;

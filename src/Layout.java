@@ -42,12 +42,12 @@ public class Layout extends Application {
     private StackPane sp;
 
     //la structure qui liera un rectangle avec un label
-    private Map<Shape, String> lienRectangleLabel;
+    private Map<Shape, Label> lienRectangleLabel;
 
 
     @Override
     public void start(Stage stage) {
-        lienRectangleLabel = new HashMap<Shape, String>();
+        lienRectangleLabel = new HashMap<Shape, Label>();
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
@@ -278,6 +278,10 @@ public class Layout extends Application {
                         tempFile = null;
                         //On supprime les labels de la fenêtre ensuite
                         panneauLabel.getItems().clear();
+
+                        //on supprime tous les rectangles et leur label de la hashmap
+                        lienRectangleLabel.clear();
+
                         checkLabel.setText("");
 
                         //Permet d'afficher l'image dans le corps de l'application
