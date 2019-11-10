@@ -23,8 +23,8 @@ import java.util.Map;
 public class PaintSurface extends JComponent
 {
     //Le rectangle en cours d'utilisation
-    private Shape r;
-    static int compteurRectangle = 1;
+    private static Shape r;
+    static int compteurRectangle = 0;
 
     //Coordonnées du rectangle en cours d'utilisation
     private int x1;
@@ -41,7 +41,7 @@ public class PaintSurface extends JComponent
     final double RATIO_IMAGE = 1.4;
 
     //Contient tous les différents rectangles qui ont pu être dessinés.
-    private ArrayList<Shape> shapes = new ArrayList<>();
+    private static ArrayList<Shape> shapes = new ArrayList<>();
 
     //Points de départ et d'arrivée du rectangle
     private Point startDrag, endDrag;
@@ -49,7 +49,7 @@ public class PaintSurface extends JComponent
     //Axes de symétrie
     private Line2D horizontalLine, verticalLine;
 
-    PaintSurface(Image img, File file, HashMap lienRectangleLabel, ListView panneauLabel, StackPane sp)
+    PaintSurface(Image img, File file, ListView panneauLabel, StackPane sp)
     {
         this.image = img;
         this.file = file;
@@ -92,15 +92,14 @@ public class PaintSurface extends JComponent
                     //On affiche le rectangle
                     shapes.add(r);
 
-                    //On créé un lien entre le rectangle et son label
-                    lienRectangleLabel.put(r,("Rectangle n° " + compteurRectangle++));
-
-                    //On met le label dans la listView
-                    Label l = new Label((String) lienRectangleLabel.get(r));
-
                     //Fonction lambda qui permet de gérer les erreurs liées à la modification de panneauLabel
                     //tout en ajoutant le label à la listView
-                    Platform.runLater(() -> panneauLabel.getItems().add(l));
+                    Platform.runLater(() ->
+                            {
+                                panneauLabel.getItems().add(compteurRectangle - 1, compteurRectangle + " - double-click to rename");
+                                panneauLabel.edit(compteurRectangle - 2);
+                                ++compteurRectangle;
+                            });
                 }
 
                 startDrag = null;
@@ -117,18 +116,22 @@ public class PaintSurface extends JComponent
         });
 
         this.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e)
+            {
                 endDrag = new Point(e.getX(), e.getY());
                 repaint();
             }
 
-            public void mouseMoved(MouseEvent e) {
+            public void mouseMoved(MouseEvent e)
+            {
                 verticalLine = null;
                 horizontalLine = null;
-                if(e.getX() <= (RATIO_IMAGE * image.getWidth())) {
+                if(e.getX() <= (RATIO_IMAGE * image.getWidth()))
+                {
                     verticalLine = makeVerticalLine(e.getX(), (int)(RATIO_IMAGE * image.getHeight()));
                 }
-                if(e.getY() <= (RATIO_IMAGE * image.getHeight())) {
+                if(e.getY() <= (RATIO_IMAGE * image.getHeight()))
+                {
                     horizontalLine = makeHorizontalLine(e.getY(), (int)(RATIO_IMAGE * image.getWidth()));
                 }
                 repaint();
@@ -138,10 +141,12 @@ public class PaintSurface extends JComponent
         this.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e)
             {
-                if(shapes.isEmpty()) {
+                if(shapes.isEmpty())
+                {
                     image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
                     repaint();
-                } else {
+                }
+                else {
                     // TODO : Message d'alerte indiquant qu'il est impossible de resize dès qu'un rectangle est dessiné
                     // (car en fait faudrait redessiner chaque rectangle et c'est trop chiant)
                 }
@@ -220,7 +225,11 @@ public class PaintSurface extends JComponent
         return y2;
     }
 
-    public Shape getR() {
+    public static Shape getR() {
         return r;
+    }
+
+    public static ArrayList<Shape> getShapes() {
+        return shapes;
     }
 }

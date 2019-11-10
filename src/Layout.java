@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -33,21 +34,15 @@ public class Layout extends Application {
     private Button exportButton;
     private Button quitButton;
 
-    private ListView panneauLabel;
-    private Label checkLabel;
+    private ListView<String> panneauLabel;
     private Label messageImporterExporter;
     private String fileName;
 
     //Corps du logiciel
     private StackPane sp;
 
-    //la structure qui liera un rectangle avec un label
-    private Map<Shape, Label> lienRectangleLabel;
-
-
     @Override
     public void start(Stage stage) {
-        lienRectangleLabel = new HashMap<Shape, Label>();
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
         //------------------------------------------------------------------
@@ -279,17 +274,12 @@ public class Layout extends Application {
                         //On supprime les labels de la fenêtre ensuite
                         panneauLabel.getItems().clear();
 
-                        //on supprime tous les rectangles et leur label de la hashmap
-                        lienRectangleLabel.clear();
-
-                        checkLabel.setText("");
-
                         //Permet d'afficher l'image dans le corps de l'application
                         image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
 
                         // Affiche la fenêtre de dessin
                         SwingUtilities.invokeLater(() -> {
-                            PaintSurface ps = new PaintSurface(image, file, (HashMap) lienRectangleLabel, panneauLabel, sp);
+                            PaintSurface ps = new PaintSurface(image, file, panneauLabel, sp);
                             PaintSurface.compteurRectangle = 1;
                             swingNode.setContent(ps);
                         });
@@ -310,54 +300,15 @@ public class Layout extends Application {
         VBox panneauVerticalGauche = new VBox();
         panneauVerticalGauche.getStyleClass().add("menuLabelsGauche-vbox");
 
-
-        //LABEL AJOUTER UN LABEL
-        Label titreLabel = new Label("Ajouter un label");
-        panneauVerticalGauche.getChildren().add(titreLabel); //permet d'afficher l'élément dans le panneau
-
-        //CASE AJOUTER UN LABEL
-        TextField ajouterLabel = new TextField();
-        panneauVerticalGauche.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
-
-        //LABEL CHECK LABEL
-        checkLabel = new Label("");
-        panneauVerticalGauche.getChildren().add(checkLabel); //indique l'état de l'ajout d'un label
-
-        //ADD LABEL BUTTON
-        Button addLabelButton = new Button();
-        panneauVerticalGauche.getChildren().add(addLabelButton); //permet d'afficher l'élément dans le panneau
-
-        Image checkIcon = new Image(getClass().getResourceAsStream("/images/check.png"));
-        ImageView checkIconView = new ImageView(checkIcon);
-        checkIconView.setFitHeight(15);
-        checkIconView.setFitWidth(15);
-        addLabelButton.setGraphic(checkIconView);//setting icon to button
-        addLabelButton.getStyleClass().add("left-button");
-
-        //Le bouton devient visible seulement lorsqu'on écrit qqchse dans la case
-        addLabelButton.visibleProperty().bind(ajouterLabel.textProperty().isEmpty().not());
-
         //CASE OÙ SONT STOCKéS LES LABELS
         panneauLabel = new ListView();
+        panneauLabel.setCellFactory(TextFieldListCell.forListView());
+        panneauLabel.setEditable(true);
+
         panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.getStyleClass().add("panneauLabel");
 
-        //Event qui ajoute un label dans le panneau
-        addLabelButton.setOnAction(e ->
-        {
-            if (ajouterLabel.getText().matches("[A-Za-z0-9éöèüàäç]+")) {
-                if (!panneauLabel.getItems().contains(ajouterLabel.getText())) {
-                    panneauLabel.getItems().add(ajouterLabel.getText());
-                    labelExporte = false;
-                    ajouterLabel.setText(""); //case vide à nouveau
-                    checkLabel.setText("");
-                } else {
-                    checkLabel.setText("\"" + ajouterLabel.getText() + "\" est déjà présent dans la liste.");
-                }
-            } else {
-                checkLabel.setText("Chiffres et lettres uniquement !");
-            }
-        });
+
 
         //DELETE LABEL BUTTON
         Label deleteLabel = new Label("");
@@ -377,6 +328,10 @@ public class Layout extends Application {
         deleteLabelButton.setOnAction(e ->
         {
             try {
+                //on supprime le rectangle de l'array (il faut bouger la souris pour qu'il disparaisse)
+                PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
+
+                //On supprime le label de la listeView
                 panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                 deleteLabel.setText("");
             } catch (Exception ex) {
@@ -386,11 +341,7 @@ public class Layout extends Application {
 
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
-        VBox.setMargin(titreLabel, new Insets(10, 10, 10, 10));
-        VBox.setMargin(ajouterLabel, new Insets(10, 10, 10, 10));
-        VBox.setMargin(checkLabel, new Insets(1, 10, 10, 10));
         VBox.setMargin(deleteLabel, new Insets(1, 10, 10, 10));
-        VBox.setMargin(addLabelButton, new Insets(1, 10, 1, 150));
         VBox.setMargin(deleteLabelButton, new Insets(1, 10, 1, 150));
 
         //La colonne prend la longueur de la fenêtre
@@ -470,4 +421,5 @@ public class Layout extends Application {
         hb.getChildren().add(stack);
         HBox.setHgrow(stack, Priority.ALWAYS);
     }
+
 }
