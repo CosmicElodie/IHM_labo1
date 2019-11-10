@@ -338,20 +338,23 @@ public class Layout extends Application {
                 //Permet de supprimer plusieurs éléments en même temps
                 if(panneauLabel.getSelectionModel().getSelectedItems().size() > 1)
                 {
-                    while (panneauLabel.getSelectionModel().getSelectedItems().size() > 0)
+                    int taille = panneauLabel.getSelectionModel().getSelectedItems().size();
+                    while (taille > 0)
                     {
+                        System.out.println("Selected items : " + panneauLabel.getSelectionModel().getSelectedItems().size());
                         //on supprime le rectangle de l'array (il faut bouger la souris pour qu'il disparaisse)
                         PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                         panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
+                        --taille;
                     }
-                    deleteLabel.setText("Les éléments ont correctement\n été supprimés.");
+                    deleteLabel.setText("Les labels ont correctement\n été supprimés.");
                 }
                 //condition pour un unique élément sélectionné
                 else
                 {
                     PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                     panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
-                    deleteLabel.setText(panneauLabel.getSelectionModel().getSelectedItem() + " a correctement été supprimé.");
+                    deleteLabel.setText("Le label a correctement été supprimé.");
                 }
 
             } catch (Exception ex) {
