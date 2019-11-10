@@ -199,6 +199,7 @@ public class Layout extends Application {
 
                         fichierExporte = true;
                         labelExporte = true;
+
                         StringBuilder sb = new StringBuilder();
                         sb.append("Image");
                         sb.append(',');
@@ -215,6 +216,8 @@ public class Layout extends Application {
                         sb.append('\n');
 
                         pw.write(sb.toString());
+                        pw.close();
+
                         messageImporterExporter.setText(fileName + " a été correctement généré.");
                     } catch (Exception e) {
                         if (isSameName) {
