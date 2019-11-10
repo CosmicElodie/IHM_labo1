@@ -341,7 +341,6 @@ public class Layout extends Application {
                     int taille = panneauLabel.getSelectionModel().getSelectedItems().size();
                     while (taille > 0)
                     {
-                        System.out.println("Selected items : " + panneauLabel.getSelectionModel().getSelectedItems().size());
                         //on supprime le rectangle de l'array (il faut bouger la souris pour qu'il disparaisse)
                         PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                         panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
