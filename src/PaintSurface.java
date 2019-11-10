@@ -24,7 +24,7 @@ public class PaintSurface extends JComponent
 {
     //Le rectangle en cours d'utilisation
     private static Shape r;
-    static int compteurRectangle = 0;
+    static int compteurRectangle = 1;
 
     //Coordonnées du rectangle en cours d'utilisation
     private int x1;
@@ -96,8 +96,8 @@ public class PaintSurface extends JComponent
                     //tout en ajoutant le label à la listView
                     Platform.runLater(() ->
                             {
-                                panneauLabel.getItems().add(compteurRectangle - 1, compteurRectangle + " - double-click to rename");
-                                panneauLabel.edit(compteurRectangle - 2);
+                                panneauLabel.getItems().add(compteurRectangle-1, compteurRectangle + " - double-click to rename");
+                                panneauLabel.edit(compteurRectangle );
                                 ++compteurRectangle;
                             });
                 }

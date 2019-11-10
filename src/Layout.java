@@ -88,7 +88,7 @@ public class Layout extends Application {
         //------------------------------------------------------------------
 
         //On crée une colonne contenant les labels
-        border.setRight(menuDroite());
+        //border.setRight(menuDroite());
 
         //------------------------------------------------------------------
         // FOOTER
@@ -308,6 +308,8 @@ public class Layout extends Application {
         panneauVerticalGauche.getChildren().add(panneauLabel); //permet d'afficher l'élément dans le panneau
         panneauLabel.getStyleClass().add("panneauLabel");
 
+        //permet de sélectionner plusieurs labels
+        panneauLabel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 
         //DELETE LABEL BUTTON
@@ -344,9 +346,6 @@ public class Layout extends Application {
         VBox.setMargin(deleteLabel, new Insets(1, 10, 10, 10));
         VBox.setMargin(deleteLabelButton, new Insets(1, 10, 1, 150));
 
-        //La colonne prend la longueur de la fenêtre
-        //VBox.setVgrow(panneauLabel, Priority.ALWAYS);
-
         return panneauVerticalGauche;
     }
 
@@ -368,7 +367,6 @@ public class Layout extends Application {
 
     /**
      * QUIT BUTTON
-     *
      * @param hb : l'espace de la fenêtre sur lequel on travaille
      */
     private void quitButton(HBox hb) {
