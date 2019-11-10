@@ -225,7 +225,7 @@ public class Layout extends Application {
         );
 
         //----------------------------------------------------
-        // SEPARATEUR - séparer les utility buttons 
+        // SEPARATEUR - séparer les utility buttons
         //----------------------------------------------------
         Pane pane = new Pane();
         //pane.setPrefWidth(WIDTH_WINDOW/10 * 5.5);
@@ -456,89 +456,6 @@ public class Layout extends Application {
         panneauVerticalDroit.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
 
         return panneauVerticalDroit;
-    }
-
-    /**
-     * MINIMIZE WINDOW
-     * @param hb
-     */
-    private void minimizeWindow(HBox hb)
-    {
-        Pane stack = new Pane();
-
-        Image minimizeIcon = new Image(getClass().getResourceAsStream("/images/minimize.png"));
-        ImageView minimizeIconView = new ImageView(minimizeIcon);
-        minimizeIconView.setFitHeight(21);
-        minimizeIconView.setFitWidth(21);
-        minimizeButton.setGraphic(minimizeIconView);//setting icon to button
-        minimizeButton.setAlignment(Pos.CENTER_RIGHT);
-
-        minimizeButton.setOnAction(event -> {
-            Stage stage = (Stage) quitButton.getScene().getWindow();
-            stage.setIconified(true);
-
-        });
-
-        stack.getChildren().addAll(minimizeButton);
-
-        hb.getChildren().add(stack);
-        HBox.setHgrow(stack, Priority.ALWAYS);
-    }
-
-    /**
-     * QUIT BUTTON
-     * @param hb : l'espace de la fenêtre sur lequel on travaille
-     */
-    private void quitWindow(HBox hb) {
-
-        Pane stack = new Pane();
-
-        //Permet de quitter l'application
-        Image quitIcon = new Image(getClass().getResourceAsStream("/images/quit.png"));
-        ImageView quitIconView = new ImageView(quitIcon);
-        quitIconView.setFitHeight(21);
-        quitIconView.setFitWidth(21);
-        quitButton.setGraphic(quitIconView);//setting icon to button
-        quitButton.setAlignment(Pos.CENTER_RIGHT);
-
-        quitButton.setOnAction(event ->
-        {
-            if (fichierExporte && labelExporte) {
-                Stage stage = (Stage) quitButton.getScene().getWindow();
-                stage.close();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Quitter l'application");
-                alert.setHeaderText("");
-                alert.setContentText("Votre travail n'a pas été exporté et va donc être perdu. Souhaitez-vous vraiment quitter ?");
-
-                //enlève les boutons de base de la fenêtre.
-                alert.initStyle(StageStyle.UNDECORATED);
-                ButtonType oui = new ButtonType("Quitter");
-                ButtonType non = new ButtonType("Annuler");
-
-                alert.getButtonTypes().setAll(oui, non);
-
-                DialogPane dialogPane = alert.getDialogPane();
-                dialogPane.getStylesheets().add(
-                        getClass().getResource("/design/stylesheet.css").toExternalForm());
-
-
-                alert.showAndWait();
-                if (alert.getResult() == oui) {
-                    Stage stage = (Stage) quitButton.getScene().getWindow();
-                    stage.close();
-                }
-            }
-        });
-
-
-        stack.getChildren().addAll(quitButton);
-        // Add offset to right for question mark to compensate for RIGHT
-        // alignment of all nodes
-
-        hb.getChildren().add(stack);
-        HBox.setHgrow(stack, Priority.ALWAYS);
     }
 
 }
