@@ -40,6 +40,7 @@ public class Layout extends Application {
     private ListView panneauLabel;
     private Label checkLabel;
     private Label messageImporterExporter;
+    private String fileName;
 
     //le rectangle en cours
     private Shape r;
@@ -142,47 +143,69 @@ public class Layout extends Application {
         //On déclare le label qui va nous signifier si l'image a correctement été importée/exportée
         messageImporterExporter = new Label("");
 
+        //CASE NOMMER FICHIER
+        TextField nomOutputFile = new TextField();
+
         //On ajoute tous ses éléments à la boxe
-        hbox.getChildren().addAll(importButton, exportButton, messageImporterExporter);
+        hbox.getChildren().addAll(importButton, exportButton, nomOutputFile, messageImporterExporter);
 
         //On définit un bouton "exporter"
         exportButton.setOnAction(
-                event -> {
-                    // Récupère le nom de l'image sans son extension
-                    if (file != null) {
-                        String format = "";
-                        int i = file.getName().lastIndexOf('.');
-                        if (i > 0) {
-                            format = file.getName().substring(i);
+                event ->
+                {
+                    fileName = "";
+                    messageImporterExporter.setText("");
+                    boolean isCorrectName = false;
+                    boolean isEmpty = false;
+                    //seulement les chiffres et les lettres sans accent sont acceptées.
+                    if (nomOutputFile.getText().matches("[A-Za-z0-9_]+"))
+                    {
+                        isEmpty = false;
+                        isCorrectName = true;
+
+                        if (file != null) {
+                            //Le nom de l'output généré sera celui rentré dans la case.
+                            fileName = nomOutputFile.getText();
+
+                            //on définit l'extension
+                            fileName += ".csv";
+
+                            //on remet la case de l'output file à vide.
+                            nomOutputFile.setText("");
+                            messageImporterExporter.setText("");
                         }
-                        String fileName = file.getName().replace(format, "");
+                    }
+                    else if (nomOutputFile.getText().matches(""))
+                    {
+                        isEmpty = true;
+                    }
 
-                        // Sauvegarde l'output à la racine du projet
-                        try (PrintWriter pw = new PrintWriter(new File(fileName + "Output.csv"))) {
-                            fichierExporte = true;
-                            labelExporte = true;
-                            StringBuilder sb = new StringBuilder();
-                            sb.append("Image");
-                            sb.append(',');
-                            sb.append("Objects");
-                            sb.append(',');
-                            sb.append("Coordinates");
-                            sb.append('\n');
+                    // Sauvegarde l'output à la racine du projet
+                    try (PrintWriter pw = new PrintWriter(new File(fileName))) {
+                        fichierExporte = true;
+                        labelExporte = true;
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Image");
+                        sb.append(',');
+                        sb.append("Objects");
+                        sb.append(',');
+                        sb.append("Coordinates");
+                        sb.append('\n');
 
-                            sb.append(file.getPath());
-                            sb.append(',');
-                            sb.append(panneauLabel.getItems());
-                            sb.append(',');
-                            sb.append("Coordonnées à implémenter");
-                            sb.append('\n');
+                        sb.append(file.getPath());
+                        sb.append(',');
+                        sb.append(panneauLabel.getItems());
+                        sb.append(',');
+                        sb.append("Coordonnées à implémenter");
+                        sb.append('\n');
 
-                            pw.write(sb.toString());
-
-                            messageImporterExporter.setText("L'output a été correctement généré.");
-                        } catch (Exception e) {
-                            fichierExporte = false;
+                        pw.write(sb.toString());
+                        messageImporterExporter.setText(fileName + " a été correctement généré.");
+                    } catch (Exception e) {
+                        if(!isCorrectName && !isEmpty)
+                            messageImporterExporter.setText("Chiffre et lettre uniquement !");
+                        else
                             messageImporterExporter.setText("L'output n'a pas correctement été généré");
-                        }
                     }
                 }
         );
