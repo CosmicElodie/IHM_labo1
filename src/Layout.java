@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import javax.swing.*;
-import javax.xml.soap.Text;
 import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
@@ -24,12 +23,9 @@ import java.util.Map;
 
 public class Layout extends Application {
 
-    private Stage window;
     private File file, tempFile;
     private boolean fichierExporte; //sert à s'assurer que l'utilisateur ait bien sauvegardé avant de quitter
     private boolean labelExporte; //pareil, mais pour s'assurer que les labels aient bien été exportés
-
-    private Text test;
 
     private Image image;
 
@@ -42,19 +38,15 @@ public class Layout extends Application {
     private Label messageImporterExporter;
     private String fileName;
 
-    //le rectangle en cours
-    private Shape r;
-
     //Corps du logiciel
-    StackPane sp;
+    private StackPane sp;
 
     //la structure qui liera un rectangle avec un label
-    Map<Shape, String> lienRectangleLabel;
+    private Map<Shape, String> lienRectangleLabel;
 
 
     @Override
     public void start(Stage stage) {
-        window = stage;
         lienRectangleLabel = new HashMap<Shape, String>();
         //------------------------------------------------------------------
         // DEFINITION DE LA FENÊTRE
@@ -117,16 +109,16 @@ public class Layout extends Application {
         Scene scene = new Scene(border, 1200, 600);
 
         scene.getStylesheets().add("/design/stylesheet.css");
-        window.setScene(scene);
-        window.setTitle("IHM - Labo1");
+        stage.setScene(scene);
+        stage.setTitle("IHM - Labo1");
         //window.initStyle(StageStyle.UNDECORATED);
-        window.show();
+        stage.show();
     }
 
     /**
      * NAVIGATION
      *
-     * @return
+     * @return hbox
      */
     private HBox navBar() {
         //On créé une boxe horizontale qui définira l'espace "navigation".
@@ -162,7 +154,6 @@ public class Layout extends Application {
 
                     //seulement les chiffres + _ + lettres sans accent sont acceptées.
                     if (nomOutputFile.getText().matches("[A-Za-z0-9_]+")) {
-                        isEmpty = false;
                         isCorrectName = true;
 
                         if (file != null) {
@@ -183,8 +174,6 @@ public class Layout extends Application {
 
                     // Sauvegarde l'output à la racine du projet
                     try {
-
-                        isSameName = false;
                         //Test si un fichier porte le même nom.
                         File directory = new File("src/output");
                         File[] fList = directory.listFiles();
@@ -256,7 +245,7 @@ public class Layout extends Application {
      * Corps logiciel
      * -> là où se charge l'image
      *
-     * @return
+     * @return sp
      */
     private StackPane corpsLogiciel() {
         //On crée le corps du logiciel (là où sera l'image)
@@ -264,7 +253,7 @@ public class Layout extends Application {
         sp.getStyleClass().add("corps-gridPane");
         SwingNode swingNode = new SwingNode();
         sp.getChildren().add(swingNode);
-        sp.setAlignment(swingNode, Pos.TOP_LEFT);
+        StackPane.setAlignment(swingNode, Pos.TOP_LEFT);
 
         //On upload l'image à partir de la sélection faite dans le gestionnaire de fichier
         importButton.setOnAction(
@@ -295,13 +284,10 @@ public class Layout extends Application {
                         image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
 
                         // Affiche la fenêtre de dessin
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                PaintSurface ps = new PaintSurface(image, file, (HashMap) lienRectangleLabel, panneauLabel, sp);
-                                ps.compteurRectangle = 1;
-                                swingNode.setContent(ps);
-                            }
+                        SwingUtilities.invokeLater(() -> {
+                            PaintSurface ps = new PaintSurface(image, file, (HashMap) lienRectangleLabel, panneauLabel, sp);
+                            PaintSurface.compteurRectangle = 1;
+                            swingNode.setContent(ps);
                         });
                     }
                 }
@@ -313,7 +299,7 @@ public class Layout extends Application {
     /**
      * Menu de gestions de labels (gauche)
      *
-     * @return
+     * @return panneauVerticalGauche
      */
     private VBox menuLabels() {
 
@@ -412,7 +398,7 @@ public class Layout extends Application {
     /**
      * MENU DROITE
      *
-     * @return
+     * @return panneauVerticalDroit
      */
     private VBox menuDroite() {
         VBox panneauVerticalDroit = new VBox();
@@ -428,7 +414,7 @@ public class Layout extends Application {
     /**
      * QUIT BUTTON
      *
-     * @param hb
+     * @param hb : l'espace de la fenêtre sur lequel on travaille
      */
     private void quitButton(HBox hb) {
 
