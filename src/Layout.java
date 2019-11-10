@@ -1,4 +1,6 @@
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,18 +13,14 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observable;
 
 public class Layout extends Application {
 
@@ -35,6 +33,7 @@ public class Layout extends Application {
     private Button importButton;
     private Button exportButton;
     private Button quitButton;
+    private Button minimizeButton;
 
     private ListView<String> panneauLabel;
     private Label messageImporterExporter;
@@ -42,6 +41,9 @@ public class Layout extends Application {
 
     //Corps du logiciel
     private StackPane sp;
+
+    final int WIDTH_WINDOW = 1200;
+    final int HEIGHT_WINDOW = 600;
 
     @Override
     public void start(Stage stage) {
@@ -64,6 +66,9 @@ public class Layout extends Application {
 
         exportButton = new Button("Exporter projet");
         exportButton.getStyleClass().add("header-button");
+
+        minimizeButton = new Button();
+        minimizeButton.getStyleClass().add("header-quit-button");
 
         quitButton = new Button();
         quitButton.getStyleClass().add("header-quit-button");
@@ -103,12 +108,13 @@ public class Layout extends Application {
         // PARAMÈTRES DE LA FENÊTRE DU LOGICIEL
         //------------------------------------------------------------------
 
-        Scene scene = new Scene(border, 1200, 600);
+        Scene scene = new Scene(border, WIDTH_WINDOW, HEIGHT_WINDOW);
 
         scene.getStylesheets().add("/design/stylesheet.css");
+
         stage.setScene(scene);
         stage.setTitle("IHM - Labo1");
-        //window.initStyle(StageStyle.UNDECORATED);
+        stage.initStyle(StageStyle.TRANSPARENT);
         stage.show();
     }
 
@@ -123,6 +129,7 @@ public class Layout extends Application {
 
         //on règle l'écart du contenu intérieur avec les bords de la boxe
         hbox.setPadding(new Insets(15, 15, 15, 15));
+        hbox.setPrefWidth(WIDTH_WINDOW);
 
         //Espace entre les éléments
         hbox.setSpacing(10);   // Gap between nodes
@@ -217,8 +224,74 @@ public class Layout extends Application {
                 }
         );
 
-        // Ajouter un bouton "quitter" dans le header
-        quitButton(hbox);
+        //----------------------------------------------------
+        // SEPARATEUR - séparer les utility buttons 
+        //----------------------------------------------------
+        Pane pane = new Pane();
+        //pane.setPrefWidth(WIDTH_WINDOW/10 * 5.5);
+        hbox.getChildren().add(pane);
+
+        //----------------------------------------------------
+        // MINIMIZE BUTTON
+        //----------------------------------------------------
+
+        Image minimizeIcon = new Image(getClass().getResourceAsStream("/images/minimize.png"));
+        ImageView minimizeIconView = new ImageView(minimizeIcon);
+        minimizeIconView.setFitHeight(21);
+        minimizeIconView.setFitWidth(21);
+        minimizeButton.setGraphic(minimizeIconView);//setting icon to button
+        minimizeButton.setAlignment(Pos.CENTER_RIGHT);
+
+        minimizeButton.setOnAction(event -> {
+            Stage stage = (Stage) minimizeButton.getScene().getWindow();
+            stage.setIconified(true);
+
+        });
+
+        hbox.getChildren().add(minimizeButton);
+
+        //----------------------------------------------------
+        // QUIT BUTTON
+        //----------------------------------------------------
+        Image quitIcon = new Image(getClass().getResourceAsStream("/images/quit.png"));
+        ImageView quitIconView = new ImageView(quitIcon);
+        quitIconView.setFitHeight(21);
+        quitIconView.setFitWidth(21);
+        quitButton.setGraphic(quitIconView);//setting icon to button
+        quitButton.setAlignment(Pos.CENTER_RIGHT);
+
+        quitButton.setOnAction(event ->
+        {
+            if (fichierExporte && labelExporte) {
+                Stage stage = (Stage) quitButton.getScene().getWindow();
+                stage.close();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Quitter l'application");
+                alert.setHeaderText("");
+                alert.setContentText("Votre travail n'a pas été exporté et va donc être perdu. Souhaitez-vous vraiment quitter ?");
+
+                //enlève les boutons de base de la fenêtre.
+                alert.initStyle(StageStyle.UNDECORATED);
+                ButtonType oui = new ButtonType("Quitter");
+                ButtonType non = new ButtonType("Annuler");
+
+                alert.getButtonTypes().setAll(oui, non);
+
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(
+                        getClass().getResource("/design/stylesheet.css").toExternalForm());
+
+
+                alert.showAndWait();
+                if (alert.getResult() == oui) {
+                    Stage stage = (Stage) quitButton.getScene().getWindow();
+                    stage.close();
+                }
+            }
+        });
+        hbox.getChildren().add(quitButton);
+
         return hbox;
     }
 
@@ -386,12 +459,39 @@ public class Layout extends Application {
     }
 
     /**
+     * MINIMIZE WINDOW
+     * @param hb
+     */
+    private void minimizeWindow(HBox hb)
+    {
+        Pane stack = new Pane();
+
+        Image minimizeIcon = new Image(getClass().getResourceAsStream("/images/minimize.png"));
+        ImageView minimizeIconView = new ImageView(minimizeIcon);
+        minimizeIconView.setFitHeight(21);
+        minimizeIconView.setFitWidth(21);
+        minimizeButton.setGraphic(minimizeIconView);//setting icon to button
+        minimizeButton.setAlignment(Pos.CENTER_RIGHT);
+
+        minimizeButton.setOnAction(event -> {
+            Stage stage = (Stage) quitButton.getScene().getWindow();
+            stage.setIconified(true);
+
+        });
+
+        stack.getChildren().addAll(minimizeButton);
+
+        hb.getChildren().add(stack);
+        HBox.setHgrow(stack, Priority.ALWAYS);
+    }
+
+    /**
      * QUIT BUTTON
      * @param hb : l'espace de la fenêtre sur lequel on travaille
      */
-    private void quitButton(HBox hb) {
+    private void quitWindow(HBox hb) {
 
-        StackPane stack = new StackPane();
+        Pane stack = new Pane();
 
         //Permet de quitter l'application
         Image quitIcon = new Image(getClass().getResourceAsStream("/images/quit.png"));
@@ -401,7 +501,8 @@ public class Layout extends Application {
         quitButton.setGraphic(quitIconView);//setting icon to button
         quitButton.setAlignment(Pos.CENTER_RIGHT);
 
-        quitButton.setOnAction(event -> {
+        quitButton.setOnAction(event ->
+        {
             if (fichierExporte && labelExporte) {
                 Stage stage = (Stage) quitButton.getScene().getWindow();
                 stage.close();
@@ -431,8 +532,8 @@ public class Layout extends Application {
             }
         });
 
+
         stack.getChildren().addAll(quitButton);
-        stack.setAlignment(Pos.CENTER_RIGHT);
         // Add offset to right for question mark to compensate for RIGHT
         // alignment of all nodes
 
