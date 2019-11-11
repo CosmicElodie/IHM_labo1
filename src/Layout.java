@@ -206,7 +206,7 @@ public class Layout extends Application {
                         sb.append(',');
                         sb.append(panneauLabel.getItems());
                         sb.append(',');
-                        sb.append("Coordonnées à implémenter");
+                        sb.append(PaintSurface.getShapes());
                         sb.append('\n');
 
                         pw.write(sb.toString());
