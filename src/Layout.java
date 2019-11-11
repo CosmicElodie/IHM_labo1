@@ -418,6 +418,7 @@ public class Layout extends Application {
                         PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                         panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
                         --taille;
+                        --PaintSurface.compteurRectangle;
                     }
                     deleteLabel.setText("Les labels ont correctement\n été supprimés.");
                 }
@@ -427,6 +428,7 @@ public class Layout extends Application {
                     PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                     panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
                     deleteLabel.setText("Le label a correctement été supprimé.");
+                    --PaintSurface.compteurRectangle;
                 }
 
             } catch (Exception ex) {

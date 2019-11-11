@@ -232,4 +232,5 @@ public class PaintSurface extends JComponent
     public static ArrayList<Shape> getShapes() {
         return shapes;
     }
+
 }
