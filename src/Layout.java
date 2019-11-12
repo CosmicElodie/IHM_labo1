@@ -111,7 +111,7 @@ public class Layout extends Application {
         scene.getStylesheets().add("/design/stylesheet.css");
 
         stage.setScene(scene);
-        //met la fenêtre au max 
+        //met la fenêtre au max
         stage.setMaximized(true);
         stage.setTitle("IHM - Labo1");
         stage.initStyle(StageStyle.TRANSPARENT);
@@ -227,9 +227,9 @@ public class Layout extends Application {
         //----------------------------------------------------
         // SEPARATEUR - séparer les utility buttons
         //----------------------------------------------------
-        Pane pane = new Pane();
-        //pane.setPrefWidth(WIDTH_WINDOW/10 * 5.5);
-        hbox.getChildren().add(pane);
+        final Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        hbox.getChildren().add(spacer);
 
         //----------------------------------------------------
         // MINIMIZE BUTTON
