@@ -44,10 +44,13 @@ public class PaintSurface extends JComponent
     //Axes de symétrie
     private Line2D horizontalLine, verticalLine;
 
+    private ListView panneauLabel;
+
     PaintSurface(Image img, File file, ListView panneauLabel, StackPane sp)
     {
         this.image = img;
         this.file = file;
+        this.panneauLabel = panneauLabel;
         this.addMouseListener(new MouseAdapter()
         {
             public void mousePressed(MouseEvent e)
@@ -83,10 +86,10 @@ public class PaintSurface extends JComponent
                     //Fonction lambda qui permet de gérer les erreurs liées à la modification de panneauLabel
                     //tout en ajoutant le label à la listView
                     Platform.runLater(() ->
-                            {
-                                panneauLabel.getItems().add(compteurRectangle - 1, label + " : double-click to rename");
-                                ++compteurRectangle;
-                            });
+                    {
+                        panneauLabel.getItems().add(compteurRectangle - 1, label + " : double-click to rename");
+                        ++compteurRectangle;
+                    });
 
                     // Crée la forme et l'ajoute à la liste
                     shapes.add(new MyShape(makeRectangle(startDrag.x, startDrag.y, x2, y2),
@@ -145,7 +148,7 @@ public class PaintSurface extends JComponent
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         // Définit les couleurs utilisées
-        Color[] colors = {Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.gray, Color.PINK, Color.ORANGE, Color.GREEN};
+        Color[] colors = {Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.GRAY, Color.PINK, Color.ORANGE, Color.GREEN};
         int colorIndex = 0;
 
         // Dessine l'image en arrière-plan
@@ -162,14 +165,15 @@ public class PaintSurface extends JComponent
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
         // Affiche les rectangles terminés selon les couleurs présentes dans le tableau "colors"
-        for (MyShape s : shapes) {
+        for(int i = 0; i < panneauLabel.getItems().size(); i++) {
+            MyShape s = shapes.get(i);
             g2.setPaint(colors[(colorIndex++) % colors.length]);
             g2.draw(s.getShape());
-            // Label
             g2.fillRect(s.getX1(), s.getY1() - 15, s.getX2(), 15);
             g2.setPaint(Color.BLACK);
             g.setFont(new Font("Century Gothic", Font.BOLD, 12));
-            g2.drawString(s.getLabel(), s.getX1(), s.getY1() - 3);
+            s.setLabel(panneauLabel.getItems().get(i).toString());
+            g2.drawString(s.getLabel(), s.getX1() + 3, s.getY1() - 3);
         }
 
         // Affiche les lignes verticales et horizontales
