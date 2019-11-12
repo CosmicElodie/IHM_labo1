@@ -23,10 +23,9 @@ import java.io.PrintWriter;
 public class Layout extends Application {
 
     private File file, tempFile;
-    private boolean fichierExporte; //sert à s'assurer que l'utilisateur ait bien sauvegardé avant de quitter
-    private boolean labelExporte; //pareil, mais pour s'assurer que les labels aient bien été exportés
-
     private Image image;
+    private boolean fichierExporte;
+    private boolean labelExporte;
 
     private Button importButton;
     private Button exportButton;
@@ -88,13 +87,6 @@ public class Layout extends Application {
 
         //On crée une colonne contenant les labels
         border.setLeft(menuLabels());
-
-        //------------------------------------------------------------------
-        // COLONNE DROITE POUR ???
-        //------------------------------------------------------------------
-
-        //On crée une colonne contenant les labels
-        //border.setRight(menuDroite());
 
         //------------------------------------------------------------------
         // FOOTER
@@ -471,21 +463,4 @@ public class Layout extends Application {
 
         return panneauVerticalGauche;
     }
-
-    /**
-     * MENU DROITE
-     *
-     * @return panneauVerticalDroit
-     */
-    private VBox menuDroite() {
-        VBox panneauVerticalDroit = new VBox();
-        panneauVerticalDroit.getStyleClass().add("menuLabelsDroite-vbox");
-
-        //CASE AJOUTER UN LABEL
-        TextField ajouterLabel = new TextField();
-        panneauVerticalDroit.getChildren().add(ajouterLabel); //permet d'afficher l'élément dans le panneau
-
-        return panneauVerticalDroit;
-    }
-
 }

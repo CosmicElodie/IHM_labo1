@@ -137,10 +137,6 @@ public class PaintSurface extends JComponent
                     image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
                     repaint();
                 }
-                else {
-                    // TODO : Message d'alerte indiquant qu'il est impossible de resize dès qu'un rectangle est dessiné
-                    // (car en fait faudrait redessiner chaque rectangle et c'est trop chiant)
-                }
             }
         });
     }
