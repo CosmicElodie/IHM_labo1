@@ -440,7 +440,7 @@ public class Layout extends Application {
                         --taille;
                         --PaintSurface.compteurRectangle;
                     }
-                    deleteLabel.setText("Les labels ont été\n correctement supprimés.");
+                    deleteLabel.setText("Les labels ont été correctement supprimés.");
                 }
                 //condition pour un unique élément sélectionné
                 else
@@ -459,7 +459,7 @@ public class Layout extends Application {
         //marges extérieures des deux cases + buttons
         VBox.setMargin(panneauLabel, new Insets(10, 10, 10, 10));
         VBox.setMargin(deleteLabel, new Insets(1, 10, 10, 10));
-        VBox.setMargin(deleteLabelButton, new Insets(1, 10, 1, 150));
+        VBox.setMargin(deleteLabelButton, new Insets(1, 10, 1, 200));
 
         return panneauVerticalGauche;
     }

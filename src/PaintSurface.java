@@ -145,7 +145,7 @@ public class PaintSurface extends JComponent
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         // Définit les couleurs utilisées
-        Color[] colors = {Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.BLUE, Color.PINK, Color.ORANGE, Color.GREEN};
+        Color[] colors = {Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.RED, Color.gray, Color.PINK, Color.ORANGE, Color.GREEN};
         int colorIndex = 0;
 
         // Dessine l'image en arrière-plan
