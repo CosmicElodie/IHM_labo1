@@ -1,6 +1,4 @@
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,12 +11,12 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 
@@ -282,7 +280,6 @@ public class Layout extends Application {
                 dialogPane.getStylesheets().add(
                         getClass().getResource("/design/stylesheet.css").toExternalForm());
 
-
                 alert.showAndWait();
                 if (alert.getResult() == oui) {
                     Stage stage = (Stage) quitButton.getScene().getWindow();
@@ -350,6 +347,10 @@ public class Layout extends Application {
                         //On supprime les labels de la fenêtre ensuite
                         panneauLabel.getItems().clear();
 
+                        //on supprime les shapes
+                        PaintSurface.getShapes().clear();
+
+
                         //Permet d'afficher l'image dans le corps de l'application
                         image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
 
@@ -402,7 +403,6 @@ public class Layout extends Application {
         deleteIconView.setFitWidth(15);
         deleteLabelButton.setGraphic(deleteIconView);//setting icon to button
         deleteLabelButton.getStyleClass().add("left-button");
-        panneauLabel.getSelectionModel().select(0);
 
         deleteLabelButton.setOnAction(e ->
         {

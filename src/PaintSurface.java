@@ -91,13 +91,11 @@ public class PaintSurface extends JComponent
 
                     //On affiche le rectangle
                     shapes.add(r);
-
                     //Fonction lambda qui permet de gérer les erreurs liées à la modification de panneauLabel
                     //tout en ajoutant le label à la listView
                     Platform.runLater(() ->
                             {
                                 panneauLabel.getItems().add(compteurRectangle - 1, compteurRectangle + " - double-click to rename");
-                                //panneauLabel.edit(compteurRectangle+1);
                                 ++compteurRectangle;
                             });
                 }
@@ -227,6 +225,10 @@ public class PaintSurface extends JComponent
 
     public static Shape getR() {
         return r;
+    }
+
+    public static void setShapes(ArrayList<Shape> shapes) {
+        PaintSurface.shapes = shapes;
     }
 
     public static ArrayList<Shape> getShapes() {
