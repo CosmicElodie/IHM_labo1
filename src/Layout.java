@@ -111,6 +111,8 @@ public class Layout extends Application {
         scene.getStylesheets().add("/design/stylesheet.css");
 
         stage.setScene(scene);
+        //met la fenêtre au max 
+        stage.setMaximized(true);
         stage.setTitle("IHM - Labo1");
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.show();
@@ -349,7 +351,6 @@ public class Layout extends Application {
 
                         //on supprime les shapes
                         PaintSurface.getShapes().clear();
-
 
                         //Permet d'afficher l'image dans le corps de l'application
                         image = new Image(file.toURI().toString(), (sp.getWidth()), (sp.getHeight()), true, false);
