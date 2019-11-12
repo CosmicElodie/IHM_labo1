@@ -215,9 +215,9 @@ public class Layout extends Application {
                         messageImporterExporter.setText(fileName + " a été correctement généré.");
                     } catch (Exception e) {
                         if (isSameName) {
-                            messageImporterExporter.setText("Ce nom existe déjà, veuiillez en choisir un autre.");
-                        } else if (!isCorrectName && !isEmpty)
-                            messageImporterExporter.setText("Chiffre et lettre uniquement !");
+                            messageImporterExporter.setText("Un fichier de ce nom existe déjà, veuillez en choisir un autre.");
+                        } else if (!isCorrectName || isEmpty)
+                            messageImporterExporter.setText("Chiffres et lettres uniquement !");
                         else
                             messageImporterExporter.setText("L'output n'a pas correctement été généré");
                     }

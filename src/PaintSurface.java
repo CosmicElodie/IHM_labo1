@@ -38,7 +38,7 @@ public class PaintSurface extends JComponent
     //Fichier en cours d'utilisation
     private File file;
 
-    final double RATIO_IMAGE = 1.4;
+    final double RATIO_IMAGE = 1;
 
     //Contient tous les différents rectangles qui ont pu être dessinés.
     private static ArrayList<Shape> shapes = new ArrayList<>();
