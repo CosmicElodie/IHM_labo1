@@ -35,6 +35,7 @@ public class Layout extends Application {
 
     private ListView<String> panneauLabel;
     private Label messageImporterExporter;
+    private Label deleteLabel;
     private String fileName;
 
     //Corps du logiciel
@@ -176,8 +177,8 @@ public class Layout extends Application {
                         isEmpty = true;
                     }
 
-
                     // Sauvegarde l'output à la racine du projet
+                    File csvFile = new File("src\\output\\" + fileName);
                     try {
                         //Test si un fichier porte le même nom.
                         File directory = new File("src/output");
@@ -189,10 +190,32 @@ public class Layout extends Application {
                             }
                         }
 
-                        PrintWriter pw = new PrintWriter(new File("src\\output\\" + fileName));
-
                         fichierExporte = true;
                         labelExporte = true;
+
+                        PrintWriter pw = new PrintWriter(csvFile);
+
+                        // Labels des rectangles
+                        StringBuilder labels = new StringBuilder("[");
+                        for (MyShape s : PaintSurface.getShapes()) {
+                            labels.append(s.getLabel()).append(", ");
+                        }
+                        if(!PaintSurface.getShapes().isEmpty()) {
+                            labels.replace(labels.length() - 2, labels.length() , "]");
+                        } else {
+                            labels.append("]");
+                        }
+
+                        // Coordonnées des rectangles
+                        StringBuilder coordinates = new StringBuilder("[");
+                        for (MyShape s : PaintSurface.getShapes()) {
+                            coordinates.append(s.toString()).append(", ");
+                        }
+                        if(!PaintSurface.getShapes().isEmpty()) {
+                            coordinates.replace(coordinates.length() - 2, coordinates.length(), "]");
+                        } else {
+                            coordinates.append("]");
+                        }
 
                         StringBuilder sb = new StringBuilder();
                         sb.append("Image");
@@ -202,11 +225,11 @@ public class Layout extends Application {
                         sb.append("Coordinates");
                         sb.append('\n');
 
-                        sb.append(file.getPath());
+                        sb.append(file.getName());
                         sb.append(',');
-                        sb.append(panneauLabel.getItems());
+                        sb.append(labels);
                         sb.append(',');
-                        sb.append(PaintSurface.getShapes());
+                        sb.append(coordinates);
                         sb.append('\n');
 
                         pw.write(sb.toString());
@@ -216,10 +239,13 @@ public class Layout extends Application {
                     } catch (Exception e) {
                         if (isSameName) {
                             messageImporterExporter.setText("Un fichier de ce nom existe déjà, veuillez en choisir un autre.");
-                        } else if (!isCorrectName || isEmpty)
+                        } else if (!isCorrectName || isEmpty) {
                             messageImporterExporter.setText("Chiffres et lettres uniquement !");
-                        else
+                        } else if (file == null) {
+                            messageImporterExporter.setText("Veuillez sélectionner un projet.");
+                        } else {
                             messageImporterExporter.setText("L'output n'a pas correctement été généré");
+                        }
                     }
                 }
         );
@@ -330,6 +356,7 @@ public class Layout extends Application {
                 event -> {
                     FileChooser fileChooser = new FileChooser();
                     fichierExporte = false;
+                    deleteLabel.setText("");
                     messageImporterExporter.setText("");
 
                     if (file != null) {
@@ -393,7 +420,7 @@ public class Layout extends Application {
         panneauLabel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //DELETE LABEL BUTTON
-        Label deleteLabel = new Label("");
+        deleteLabel = new Label("");
         Button deleteLabelButton = new Button();
         panneauVerticalGauche.getChildren().add(deleteLabelButton); //permet d'afficher l'élément dans le panneau
         panneauVerticalGauche.getChildren().add(deleteLabel); //indique l'état de l'ajout d'un label
@@ -421,14 +448,14 @@ public class Layout extends Application {
                         --taille;
                         --PaintSurface.compteurRectangle;
                     }
-                    deleteLabel.setText("Les labels ont correctement\n été supprimés.");
+                    deleteLabel.setText("Les labels ont été\n correctement supprimés.");
                 }
                 //condition pour un unique élément sélectionné
                 else
                 {
                     PaintSurface.getShapes().remove(panneauLabel.getSelectionModel().getSelectedIndex());
                     panneauLabel.getItems().remove(panneauLabel.getSelectionModel().getSelectedItem());
-                    deleteLabel.setText("Le label a correctement été supprimé.");
+                    deleteLabel.setText("Le label a été correctement supprimé.");
                     --PaintSurface.compteurRectangle;
                 }
 

@@ -1,4 +1,5 @@
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -18,19 +19,13 @@ import java.io.Console;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class PaintSurface extends JComponent
 {
-    //Le rectangle en cours d'utilisation
-    private static Shape r;
     static int compteurRectangle = 1;
-
-    //Coordonnées du rectangle en cours d'utilisation
-    private int x1;
-    private int y1;
-    private int x2;
-    private int y2;
 
     //Image en cours d'utilisation
     private Image image;
@@ -41,7 +36,7 @@ public class PaintSurface extends JComponent
     final double RATIO_IMAGE = 1;
 
     //Contient tous les différents rectangles qui ont pu être dessinés.
-    private static ArrayList<Shape> shapes = new ArrayList<>();
+    private static ArrayList<MyShape> shapes = new ArrayList<>();
 
     //Points de départ et d'arrivée du rectangle
     private Point startDrag, endDrag;
@@ -68,36 +63,34 @@ public class PaintSurface extends JComponent
             public void mouseReleased(MouseEvent e)
             {
                 //On stocke les variables du rectangle qu'on a dessiné.
-                int x = e.getX();
-                int y = e.getY();
+                int x2 = e.getX();
+                int y2 = e.getY();
 
                 // En cas de relachement en dehors de l'image, le rectangle se dessine en bordure
                 if(endDrag.x < 0)
-                    x = 0;
+                    x2 = 0;
                 if(endDrag.x > (RATIO_IMAGE * image.getWidth()))
-                    x = (int)(RATIO_IMAGE * image.getWidth());
+                    x2 = (int)(RATIO_IMAGE * image.getWidth());
                 if(endDrag.y < 0)
-                    y = 0;
+                    y2 = 0;
                 if(endDrag.y > (RATIO_IMAGE * image.getHeight()))
-                    y = (int)(RATIO_IMAGE * image.getHeight());
+                    y2 = (int)(RATIO_IMAGE * image.getHeight());
 
                 // Le rectangle ne se dessine que s'il était dans l'image au début
                 if(startDrag.x <= (RATIO_IMAGE * image.getWidth()) && startDrag.y <= (RATIO_IMAGE * image.getHeight())) {
-                    x1 = startDrag.x;
-                    y1 = startDrag.y;
-                    x2 = x;
-                    y2 = y;
-                    r = makeRectangle(x1,y1,x2,y2);
 
-                    //On affiche le rectangle
-                    shapes.add(r);
+                    String label = "<Label" + compteurRectangle + ">";
                     //Fonction lambda qui permet de gérer les erreurs liées à la modification de panneauLabel
                     //tout en ajoutant le label à la listView
                     Platform.runLater(() ->
                             {
-                                panneauLabel.getItems().add(compteurRectangle - 1, compteurRectangle + " - double-click to rename");
+                                panneauLabel.getItems().add(compteurRectangle - 1, label + " : double-click to rename");
                                 ++compteurRectangle;
                             });
+
+                    // Crée la forme et l'ajoute à la liste
+                    shapes.add(new MyShape(makeRectangle(startDrag.x, startDrag.y, x2, y2),
+                            Math.min(startDrag.x, x2), Math.min(startDrag.y, y2), Math.abs(startDrag.x - x2), Math.abs(startDrag.y - y2), label));
                 }
 
                 startDrag = null;
@@ -173,9 +166,14 @@ public class PaintSurface extends JComponent
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
         // Affiche les rectangles terminés selon les couleurs présentes dans le tableau "colors"
-        for (Shape s : shapes) {
+        for (MyShape s : shapes) {
             g2.setPaint(colors[(colorIndex++) % colors.length]);
-            g2.draw(s);
+            g2.draw(s.getShape());
+            // Label
+            g2.fillRect(s.getX1(), s.getY1() - 15, s.getX2(), 15);
+            g2.setPaint(Color.BLACK);
+            g.setFont(new Font("Century Gothic", Font.BOLD, 12));
+            g2.drawString(s.getLabel(), s.getX1(), s.getY1() - 3);
         }
 
         // Affiche les lignes verticales et horizontales
@@ -190,8 +188,8 @@ public class PaintSurface extends JComponent
         if (startDrag != null && endDrag != null) {
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
             g2.setPaint(Color.ORANGE);
-            r = makeRectangle(startDrag.x, startDrag.y, endDrag.x, endDrag.y);
-            g2.draw(r);
+            Shape s = makeRectangle(startDrag.x, startDrag.y, endDrag.x, endDrag.y);
+            g2.draw(s);
         }
     }
 
@@ -207,32 +205,7 @@ public class PaintSurface extends JComponent
         return new Line2D.Float(0, y, imageWidth, y);
     }
 
-    public int getX1() {
-        return x1;
-    }
-
-    public int getY1() {
-        return y1;
-    }
-
-    public int getX2() {
-        return x2;
-    }
-
-    public int getY2() {
-        return y2;
-    }
-
-    public static Shape getR() {
-        return r;
-    }
-
-    public static void setShapes(ArrayList<Shape> shapes) {
-        PaintSurface.shapes = shapes;
-    }
-
-    public static ArrayList<Shape> getShapes() {
+    public static ArrayList<MyShape> getShapes() {
         return shapes;
     }
-
 }
